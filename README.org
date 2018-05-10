@@ -1,0 +1,366 @@
+# -*- mode: org; -*-
+
+#+TITLE: ~graph_export~
+#+AUTHOR: Wouter Beek
+
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="/home/wbeek/Git/org-html-themes/styles/readtheorg/css/htmlize.css"/>
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="/home/wbeek/Git/org-html-themes/styles/readtheorg/css/readtheorg.css"/>
+
+#+HTML_HEAD: <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+#+HTML_HEAD: <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+#+HTML_HEAD: <script type="text/javascript" src="/home/wbeek/Git/org-html-themes/styles/lib/js/jquery.stickytableheaders.min.js"></script>
+#+HTML_HEAD: <script type="text/javascript" src="/home/wbeek/Git/org-html-themes/styles/readtheorg/js/readtheorg.js"></script>
+
+A simple graph export library for SWI-Prolog.
+
+* Installation
+
+  1. Install [[http://www.swipl-prolog.org][SWI-Prolog]]
+
+  2. Install GraphViz:
+
+     #+BEGIN_SRC sh
+     $ sudo apt install graphviz # Debian-based distro's, e.g., Ubuntu
+     $ sudo dnf install graphviz # Red Hat-based distro's, e.g., Fedora
+     #+END_SRC
+
+  3. Start SWI-Prolog:
+
+     #+BEGIN_SRC prolog
+     $ swipl
+     #+END_SRC
+
+  4. Install this library by using the Prolog package installer:
+
+     #+BEGIN_SRC prolog
+     ?- pack_install(graph_export).
+     #+END_SRC
+
+* Use
+
+Once installed, you can use this library by importing it with the
+following command:
+
+#+BEGIN_SRC prolog
+?- [library(graph/graph_export)].
+#+END_SRC
+
+** Basics
+
+The basic feature of this library is that it allows you to write to a
+GraphViz output file or to a GraphViz viewer by simply writing to a
+Prolog output stream.  The following example shows how to write one
+node, and open the result in a GraphViz viewer:
+
+#+BEGIN_SRC prolog
+?- view_graph([Out]>>format(Out, "x [label=<Hello,<BR/>world!>]\n", [])).
+#+END_SRC
+
+[[./example/hello.svg]]
+
+** Additional support
+
+In addition to the basics of exporting to a GraphViz file / viewing in
+a GraphViz viewer by writing to a Prolog output stream
+(~export_graph/[2,3]~ and ~view_graph/[1,2]~), this library also
+provides support predicates for common tasks.  For example, the above
+graph could have been written in the following way:
+
+#+BEGIN_SRC prolog
+?- view_graph([Out]>>dot_node(Out, "Hello,<BR>/world!")).
+#+END_SRC
+
+Similarly, there are support predicate for writing arcs and edges.
+
+** Directed or undirected
+
+Both directed and undirected graphs can be exported.  By default,
+~export_graph/[2,3]~ and ~view_graph/[1,2]~ export undirected graphs.
+Directed graphs are exported by setting the ~directed(true)~ option in
+~export_graph/3~ or ~view_graph/2~.  For undirected graphs, undirected
+edges are emitted with ~dot_edge/[3,4]~ and ~dot_edge_id/[3,4]~.  For
+directed graph, directed edges or arcs are emitted with
+~dot_arc/[3,4]~ and ~dot_arc_id/[3,4]~.
+
+** Debugging graph exports
+
+Sometimes when you use this library, or any other graph export
+library, a graph export may come out incorrectly: it either does not
+compile, or it does compile but looks weird.  In such cases, it is
+convenient to be able to print the content that is exported to the
+top-level for inspection by the programmer.  Printing the export to
+the top-level can be enabled with ~debug(dot)~, and disabled by
+~nodebug(dot)~ (see library debug for more information).
+
+* Real-world use cases
+
+** Exporting parse trees
+
+Suppose your program returns parse trees:
+
+#+BEGIN_SRC prolog
+?- Tree = s(np(det(the),n(cat)),vp(v(loves),np(det(the),n(dog))))
+#+END_SRC
+
+The following code exports such parse trees to a PDF file (see
+~example/parse_tree.pl~):
+
+#+BEGIN_SRC prolog
+:- use_module(library(apply)).
+:- use_module(library(graph/graph_export)).
+:- use_module(library(yall)).
+
+export_tree(Tree) :-
+  export_graph('parse_tree.pdf', {Tree}/[Out]>>export_tree(Out, Tree, _)).
+
+export_tree(Out, Tree, Id) :-
+  Tree =.. [Op|Trees],
+  dot_id(Id),
+  dot_node_id(Out, Id, [label(Op)]),
+  maplist(export_tree(Out), Trees, Ids),
+  maplist(dot_edge_id(Out, Id), Ids).
+#+END_SRC
+
+For the syntax tree above (~$Tree~), this gives the following result:
+
+#+BEGIN_SRC prolog
+?- export_tree($Tree).
+#+END_SRC
+
+[[./example/parse_tree.svg]]
+
+Notice that we create a new DOT ID (~dot_id/1~) for each node in the
+tree.  Because of this, the two occurrences of ‘the’ can be
+distinguished.
+
+** Exporting a proof tree
+
+Suppose your program returns a proof tree of the following form:
+
+#+BEGIN_SRC prolog
+?- Proof = t(rdfs(3),isa(class,class),[t(axiom(rdfs),range(range,class),[]),
+                                       t(axiom(rdfs),range(subClassOf,class),[])]).
+#+END_SRC
+
+#+BEGIN_SRC prolog
+view_proof(Proof) :-
+  view_graph({Proof}/[Out]>>export_proof(Out, Proof), [directed(true)]).
+
+export_proof(Out, Tree) :-
+  Tree = t(Rule,Concl,Prems),
+  dot_node(Out, Concl),
+  dot_node(Out, Tree, [label(Rule)]),
+  dot_arc(Out, Concl, Tree),
+  maplist(export_subproof(Out, Tree), Prems).
+  
+export_subproof(Out, Node, Tree) :-
+  Tree = t(_Rule,Concl,_Prems),
+  dot_node(Out, Concl),
+  dot_arc(Out, Node, Concl),
+  export_proof(Out, Tree).
+#+END_SRC
+
+The above proof tree (~$Proof~) is opened in a viewer as follows:
+
+#+BEGIN_SRC prolog
+?- view($Proof).
+#+END_SRC
+
+[[./example/proof_tree.svg]]
+
+* Enumerations
+
+** Layout methods
+
+The followig GraphViz methods for layout are supported.  They can be
+specified with the ~method(+atom)~ option.
+
+| *Method*    | *Use case*               |
+|-------------+--------------------------|
+| ~circo~     | Circular graph layouts.  |
+| ~dot~       | Directed graphs.         |
+| ~fdp~       | Undirected graphs.       |
+| ~neato~     | Undirected graphs.       |
+| ~osage~     | Array-based layouts.     |
+| ~patchwork~ | Squarified tree maps.    |
+| ~sfdp~      | Large undirected graphs. |
+| ~twopi~     | Radial graph layouts.    |
+
+** Output formats
+
+| *Extension* | *Type* | *Description*                                                                                                                         |
+|-------------+--------+---------------------------------------------------------------------------------------------------------------------------------------|
+| ~bmp~       | binary | Windows Bitmap (BMP)                                                                                                                  |
+| ~canon~     | text   | TODO                                                                                                                                  |
+| ~cgimage~   | binary | CGImage, a drawable image object in Core Graphics (the low-level procedural drawing API for iOS and Mac OS X).                        |
+| ~cmap~      | text   | TODO                                                                                                                                  |
+| ~cmapx~     | text   | TODO                                                                                                                                  |
+| ~cmapx_np~  | text   | TODO                                                                                                                                  |
+| ~dot~       | text   | TODO                                                                                                                                  |
+| ~dot_json~  | text   | TODO                                                                                                                                  |
+| ~eps~       | binary | Encapsulated PostScript (EPS)                                                                                                         |
+| ~exr~       | binary | OpenEXR: a high dynamic-range (HDR) image file format developed by Industrial Light & Magic for use in computer imaging applications. |
+| ~fig~       | text   | FIG graphics format used by Xfig                                                                                                      |
+| ~gd~        | text   | TODO                                                                                                                                  |
+| ~gd2~       | binary | TODO                                                                                                                                  |
+| ~gif~       | binary | Graphics Interchange Format (GIF)                                                                                                     |
+| ~gtk~       | viewer | TODO                                                                                                                                  |
+| ~gv~        | text   | Same as ~dot~                                                                                                                         |
+| ~ico~       | binary | TODO                                                                                                                                  |
+| ~imap~      | text   | TODO                                                                                                                                  |
+| ~imap_np~   | text   | TODO                                                                                                                                  |
+| ~ismap~     | text   | HTML image map                                                                                                                        |
+| ~jp2~       | binary | JPEG 2000                                                                                                                             |
+| ~jpe~       | binary | Same as ~jpeg~                                                                                                                        |
+| ~jpeg~      | binary | JPEG                                                                                                                                  |
+| ~jpg~       | binary | Same as ~jpeg~                                                                                                                        |
+| ~json~      | text   | TODO                                                                                                                                  |
+| ~json0~     | text   | TODO                                                                                                                                  |
+| ~pct~       | binary | PICT: A graphics file format introduced on the original Apple Macintosh computer as its standard metafile format.                     |
+| ~pdf~       | binary | Portable Document Format (PDF)                                                                                                        |
+| ~pic~       | text   | PIC language developed for troff                                                                                                      |
+| ~pict~      | text   | Same as ~pic~                                                                                                                         |
+| ~plain~     | text   | TODO                                                                                                                                  |
+| ~plain-ext~ | text   | TODO                                                                                                                                  |
+| ~png~       | text   | PNG                                                                                                                                   |
+| ~pov~       | binary | Scene-description language for 3D modelling for the Persistence of Vision Raytracer                                                   |
+| ~ps~        | binary | PostScript                                                                                                                            |
+| ~ps2~       | binary | PostScript output with PDF notations                                                                                                  |
+| ~psd~       | binary | Adobe Photoshop PSD                                                                                                                   |
+| ~sgi~       | binary | Silicon Graphis Image (SGI)                                                                                                           |
+| ~svg~       | text   | Scalable Vector Graphics (SVG)                                                                                                        |
+| ~svgz~      | binary | GNU zipped SVG                                                                                                                        |
+| ~tga~       | binary | Truevision Advanced Raster Graphics Adapter (TARGA)                                                                                   |
+| ~tif~       | binary | Same as ~tiff~                                                                                                                        |
+| ~tiff~      | binary | TIFF                                                                                                                                  |
+| ~tk~        | text   | TK graphics primitives                                                                                                                |
+| ~vdx~       | text   | Microsoft Visio XML drawing                                                                                                           |
+| ~vml~       | text   | Vector Markup Lanuage (VML)                                                                                                           |
+| ~vmlz~      | binary | GNU zipped VML                                                                                                                        |
+| ~vrml~      | text   | Virtual Reality Modeling Language (VRML)                                                                                              |
+| ~wbmp~      | binary | Wireless Application Protocol Bitmap Format (WBMP)                                                                                    |
+| ~webp~      | binary | Google image format for the web (WebP)                                                                                                |
+| ~x11~       | viewer | X11                                                                                                                                   |
+| ~xdot~      | text   | TODO                                                                                                                                  |
+| ~xdot_json~ | text   | TODO                                                                                                                                  |
+| ~xdot1.2~   | text   | TODO                                                                                                                                  |
+| ~xdot1.4~   | text   | TODO                                                                                                                                  |
+| ~xlib~      | viewer | TODO                                                                                                                                  |
+
+** DOT HTML-like labels
+
+The DOT language supports several HTML-like facilities that allow rich
+labels to be printed for arcs, edges, and nodes.  These can be
+specified by option ~label(+Label)~, which takes either a string or a
+list of strings.  In a list of strings, each string represents one
+line in a multi-line label.
+
+Strings must adhere to the following BNF grammar for DOT HTML-like
+labels:
+
+#+BEGIN_SRC bnf
+label :   text
+        | table
+text :   textitem
+       | text textitem
+textitem :   string
+           | <BR/>
+           | <FONT> text </FONT>
+           | <I> text </I>
+           | <B> text </B>
+           | <U> text </U>
+           | <O> text </O>
+           | <SUB> text </SUB>
+           | <SUP> text </SUP>
+           | <S> text </S>
+table : [ <FONT> ] <TABLE> rows </TABLE> [ </FONT> ]
+rows :   row
+       | rows row
+       | rows <HR/> row
+row: <TR> cells </TR>
+cells :   cell
+        | cells cell
+        | cells <VR/> cell
+cell:   <TD> label </TD>
+      | <TD> <IMG/> </TD>
+#+END_SRC
+
+In addition to the above BNF grammar, tags are allowed to have
+attributes that are formatted similar to HTML attributes.  Different
+tags support different sets of attributes:
+
+*** Supported attributes for ~TABLE~
+
+  - `ALIGN="CENTER|LEFT|RIGHT"`
+  - `BGCOLOR="color"`
+  - `BORDER="value"`
+  - `CELLBORDER="value"`
+  - `CELLPADDING="value"`
+  - `CELLSPACING="value"`
+  - `COLOR="color"`
+  - `COLUMNS="value"`
+  - `FIXEDSIZE="FALSE|TRUE"`
+  - `GRADIENTANGLE="value"`
+  - `HEIGHT="value"`
+  - `HREF="value"`
+  - `ID="value"`
+  - `PORT="portName"`
+  - `ROWS="value"`
+  - `SIDES="value"`
+  - `STYLE="value"`
+  - `TARGET="value"`
+  - `TITLE="value"`
+  - `TOOLTIP="value"`
+  - `VALIGN="MIDDLE|BOTTOM|TOP"`
+  - `WIDTH="value"`
+
+*** Supported attributes for ~BR~
+
+  - ~ALIGN="CENTER|LEFT|RIGHT"~
+
+*** Supported attributes for ~FONT~
+
+  - ~COLOR="color"~
+
+    Sets the color of the font of text that appears within
+    ~<FONT>…</FONT>~, or the border color of the table or cell within
+    the scope of ~<TABLE>…</TABLE>~, or ~<TD>…</TD>~.  This color can
+    be overridden by ~COLOR~ attributes in descendents.  By default,
+    the font color is determined by the GraphViz ~fontcolor~ attribute
+    of the corresponding node, edge or graph, and the border color is
+    determined by the GraphViz ~color~ attribute of the corresponding
+    node, edge or graph.
+
+  - ~FACE="fontname"~
+
+  - ~POINT-SIZE="value"~
+
+*** Supported attributes for ~IMG~
+
+  - ~SCALE="FALSE|TRUE|WIDTH|HEIGHT|BOTH"~
+  - ~SRC="value"~
+
+*** Supported attributes for ~TD~
+
+  - ~ALIGN="CENTER|LEFT|RIGHT|TEXT"~
+  - ~BALIGN="CENTER|LEFT|RIGHT"~
+  - ~BGCOLOR="color"~
+  - ~BORDER="value"~
+  - ~CELLPADDING="value"~
+  - ~CELLSPACING="value"~
+  - ~COLOR="color"~
+  - ~COLSPAN="value"~
+  - ~FIXEDSIZE="FALSE|TRUE"~
+  - ~GRADIENTANGLE="value"~
+  - ~HEIGHT="value"~
+  - ~HREF="value"~
+  - ~ID="value"~
+  - ~PORT="portName"~
+  - ~ROWSPAN="value"~
+  - ~SIDES="value"~
+  - ~STYLE="value"~
+  - ~TARGET="value"~
+  - ~TITLE="value"~
+  - ~TOOLTIP="value"~
+  - ~VALIGN="MIDDLE|BOTTOM|TOP"~
+  - ~WIDTH="value"~

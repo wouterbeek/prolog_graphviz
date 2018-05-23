@@ -1,7 +1,5 @@
-# -*- mode: org; -*-
-
-#+TITLE: ~graph_export~
-#+AUTHOR: Wouter Beek
+#+author: Wouter Beek
+#+title: graph_export
 
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="/home/wbeek/Git/org-html-themes/styles/readtheorg/css/htmlize.css"/>
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="/home/wbeek/Git/org-html-themes/styles/readtheorg/css/readtheorg.css"/>

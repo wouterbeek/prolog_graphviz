@@ -2,28 +2,30 @@
   graph_export,
   [
   % GRAPHVIZ EXPORT/VIEW
-    export_graph/2,   % +File, :Goal_1
-    export_graph/3,   % +File, :Goal_1, +Options
-    view_graph/1,     % :Goal_1
-    view_graph/2,     % :Goal_1, +Options
+    export_graph/2,     % +File, :Goal_1
+    export_graph/3,     % +File, :Goal_1, +Options
+    view_graph/1,       % :Goal_1
+    view_graph/2,       % :Goal_1, +Options
   % DOT PRIMITIVES
-    dot_arc/3,        % +Out, +FromTerm, +ToTerm
-    dot_arc/4,        % +Out, +FromTerm, +ToTerm. +Attributes
-    dot_arc_id/3,     % +Out, +FromId, +ToId
-    dot_arc_id/4,     % +Out, +FromId, +ToId. +Attributes
-    dot_edge/3,       % +Out, +FromTerm, +ToTerm
-    dot_edge/4,       % +Out, +FromTerm, +ToTerm. +Attributes
-    dot_edge_id/3,    % +Out, +FromId, +ToId
-    dot_edge_id/4,    % +Out, +FromId, +ToId. +Attributes
-    dot_id/1,         % -Id
-    dot_node/2,       % +Out, +Term
-    dot_node/3,       % +Out, +Term, +Attributes
-    dot_node_id/2,    % +Out, +Id
-    dot_node_id/3,    % +Out, +Id, +Attributes
+    dot_arc/3,          % +Out, +FromTerm, +ToTerm
+    dot_arc/4,          % +Out, +FromTerm, +ToTerm. +Attributes
+    dot_arc_id/3,       % +Out, +FromId, +ToId
+    dot_arc_id/4,       % +Out, +FromId, +ToId. +Attributes
+    dot_edge/3,         % +Out, +FromTerm, +ToTerm
+    dot_edge/4,         % +Out, +FromTerm, +ToTerm. +Attributes
+    dot_edge_id/3,      % +Out, +FromId, +ToId
+    dot_edge_id/4,      % +Out, +FromId, +ToId. +Attributes
+    dot_html_replace/2, % +Unescaped, -Escaped
+    dot_id/1,           % -Id
+    dot_id/2,           % +Term, -Id
+    dot_node/2,         % +Out, +Term
+    dot_node/3,         % +Out, +Term, +Attributes
+    dot_node_id/2,      % +Out, +Id
+    dot_node_id/3,      % +Out, +Id, +Attributes
   % GRAPHVIZ FORMATS/METHODS
-    gv_format/1,      % ?Format
-    gv_format_type/2, % ?Format, ?Type
-    gv_method/1       % ?Method
+    gv_format/1,        % ?Format
+    gv_format_type/2,   % ?Format, ?Type
+    gv_method/1         % ?Method
   ]
 ).
 
@@ -39,6 +41,7 @@ Support for exporting graphs using the GraphViz DOT format.
 
 :- use_module(library(apply)).
 :- use_module(library(debug)).
+:- use_module(library(error)).
 :- use_module(library(option)).
 :- use_module(library(process)).
 :- use_module(library(settings)).
@@ -78,12 +81,17 @@ Support for exporting graphs using the GraphViz DOT format.
 % @arg Options is a list that may include any of the following
 %      options:
 %
-%      * directed(+Directed:boolean)
+%      * directed(+boolean)
 %
 %        Whether the graph is directed (`true`) or undirected
 %        (`false`, default).
 %
-%      * format(+Format:atom)
+%      * overlap(+boolean)
+%
+%        Whether or not nodes are allowed to overlap.  Default is
+%        `false`.
+%
+%      * format(+atom)
 %
 %        The format that is used to store the output in.  Both binary
 %        and text output formats are supported.  See
@@ -91,18 +99,21 @@ Support for exporting graphs using the GraphViz DOT format.
 %        [binary,text])` for possible values.  The default value is
 %        stored in setting `default_export_format`.
 % 
-%      * method(+Method:atom)
+%      * method(+atom)
 %
 %        The method that is used by GraphViz to calculate the graph
 %        layout.  See `gv_method(-Method)` for possible values.  The
 %        default value is stored in setting `default_method`.
+%
+%      * name(+atom)
+%
+%        The name of the graph.  Default is `noname`.
 
 export_graph(File, Goal_1) :-
   export_graph(File, Goal_1, []).
 
 
 export_graph(File, Goal_1, Options) :-
-  option(directed(Directed), Options, false),
   export_format_option(Format, Type, Options),
   method_option(Method, Options),
   setup_call_cleanup(
@@ -122,7 +133,7 @@ export_graph(File, Goal_1, Options) :-
       ),
       (
         call_cleanup(
-          write_graph(Directed, Goal_1, ProcIn),
+          write_graph(ProcIn, Goal_1, Options),
           close(ProcIn)
         ),
         copy_stream_data(ProcOut, Out)
@@ -151,14 +162,24 @@ method_option(Method, Options) :-
   ),
   call_must_be(gv_method, Method).
 
-write_graph(Directed, Goal_1, Out) :-
+write_graph(Out, Goal_1, Options) :-
+  option(directed(Directed), Options, false),
+  must_be(boolean, Directed),
   graph_type(Directed, Type),
-  format_debug(dot, Out, "~a g {", [Type]),
+  option(name(Name), Options, noname),
+  must_be(atom, Name),
+  format_debug(dot, Out, "~a ~a {", [Type,Name]),
+  write_graph_attributes(Out, Options),
   call(Goal_1, Out),
   format_debug(dot, Out, "}").
 
 graph_type(false, graph).
 graph_type(true, digraph).
+
+write_graph_attributes(Out, Options) :-
+  option(overlap(Overlap), Options, false),
+  must_be(boolean, Overlap),
+  format_debug(dot, Out, "  graph [overlap=~a];", [Overlap]).
 
 
 

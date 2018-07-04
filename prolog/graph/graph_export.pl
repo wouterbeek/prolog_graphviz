@@ -98,7 +98,7 @@ Support for exporting graphs using the GraphViz DOT format.
 %        `gv_format_type(-Format, Type), memberchk(Type,
 %        [binary,text])` for possible values.  The default value is
 %        stored in setting `default_export_format`.
-% 
+%
 %      * method(+atom)
 %
 %        The method that is used by GraphViz to calculate the graph
@@ -204,7 +204,7 @@ write_graph_attributes(Out, Options) :-
 %        `gv_format_type(-Format, Type), memberchk(Type,
 %        [binary,text])` for possible values.  The default value is
 %        stored in setting `default_export_format`.
-% 
+%
 %      * method(+Method:atom)
 %
 %        The method that is used by GraphViz to calculate the graph

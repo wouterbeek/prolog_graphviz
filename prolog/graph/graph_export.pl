@@ -8,20 +8,20 @@
     view_graph/2,       % :Goal_1, +Options
   % DOT PRIMITIVES
     dot_arc/3,          % +Out, +FromTerm, +ToTerm
-    dot_arc/4,          % +Out, +FromTerm, +ToTerm. +Attributes
+    dot_arc/4,          % +Out, +FromTerm, +ToTerm. +Options
     dot_arc_id/3,       % +Out, +FromId, +ToId
-    dot_arc_id/4,       % +Out, +FromId, +ToId. +Attributes
+    dot_arc_id/4,       % +Out, +FromId, +ToId. +Options
     dot_edge/3,         % +Out, +FromTerm, +ToTerm
-    dot_edge/4,         % +Out, +FromTerm, +ToTerm. +Attributes
+    dot_edge/4,         % +Out, +FromTerm, +ToTerm. +Options
     dot_edge_id/3,      % +Out, +FromId, +ToId
-    dot_edge_id/4,      % +Out, +FromId, +ToId. +Attributes
+    dot_edge_id/4,      % +Out, +FromId, +ToId. +Options
     dot_html_replace/2, % +Unescaped, -Escaped
     dot_id/1,           % -Id
     dot_id/2,           % +Term, -Id
     dot_node/2,         % +Out, +Term
-    dot_node/3,         % +Out, +Term, +Attributes
+    dot_node/3,         % +Out, +Term, +Options
     dot_node_id/2,      % +Out, +Id
-    dot_node_id/3,      % +Out, +Id, +Attributes
+    dot_node_id/3,      % +Out, +Id, +Options
   % GRAPHVIZ FORMATS/METHODS
     gv_format/1,        % ?Format
     gv_format_type/2,   % ?Format, ?Type
@@ -36,6 +36,7 @@ Support for exporting graphs using the GraphViz DOT format.
 ---
 
 @author Wouter Beek
+@see https://www.graphviz.org
 @version 2018
 */
 
@@ -222,10 +223,10 @@ view_format(Format) :-
 
 
 
-% GRAPHVIZ WRITING %
+% DOT PRIMITIVES %
 
 %! dot_arc(+Out:stream, +FromTerm:term, +ToTerm:term) is det.
-%! dot_arc(+Out:stream, +FromTerm:term, +ToTerm:term, +Attributes:list(compound)) is det.
+%! dot_arc(+Out:stream, +FromTerm:term, +ToTerm:term, +Options:list(compound)) is det.
 %
 % Emits an arc (directed edge) from one Prolog term to another in the
 % DOT language.
@@ -234,24 +235,24 @@ view_format(Format) :-
 % automatically creates compatible DOT IDs under the hood.  The same
 % Prolog term is always denoted by the same DOT ID.
 %
-% @see Most of the time, the use of Prolog terms instead of DOT ID is
+% @see Most of the time, the use of Prolog terms instead of DOT IDs is
 %      preferable.  However, there are legitimate use cases where the
-%      programmer would like to generate and use the DOT IDs
-%      themselves.  For these purposes, dot_arc_id/[3,4] can be used --
-%      in combination with dot_id/2 -- instead.
+%      programmer would like to generate and use the DOT IDs herself.
+%      For these purposes, dot_arc_id/[3,4] can be used -- in
+%      combination with dot_id/2 -- instead.
 
 dot_arc(Out, FromTerm, ToTerm) :-
   dot_arc(Out, FromTerm, ToTerm, []).
 
 
-dot_arc(Out, FromTerm, ToTerm, Attrs) :-
+dot_arc(Out, FromTerm, ToTerm, Options) :-
   maplist(dot_id, [FromTerm,ToTerm], [FromId,ToId]),
-  dot_arc_id(Out, FromId, ToId, Attrs).
+  dot_arc_id(Out, FromId, ToId, Options).
 
 
 
 %! dot_arc_id(+Out:stream, +FromId:atom, +ToId:atom) is det.
-%! dot_arc_id(+Out:stream, +FromId:atom, +ToId:atom, +Attributes:list(compound)) is det.
+%! dot_arc_id(+Out:stream, +FromId:atom, +ToId:atom, +Options:list(compound)) is det.
 %
 % Emits a directed edge or arc from one DOT ID to another in the DOT
 % language.
@@ -262,30 +263,30 @@ dot_arc_id(Out, FromId, ToId) :-
   dot_arc_id(Out, FromId, ToId, []).
 
 
-dot_arc_id(Out, FromId, ToId, Attrs) :-
-  dot_attributes(Attrs, Str),
+dot_arc_id(Out, FromId, ToId, Options) :-
+  dot_attributes(Options, Str),
   format_debug(dot, Out, "  ~a -> ~a~s;", [FromId,ToId,Str]).
 
 
 
-%! dot_attributes(+Attributes:list(compound), -String:string) is det.
+%! dot_attributes(+Options:list(compound), -String:string) is det.
 
 dot_attributes([], "") :- !.
-dot_attributes(Attrs, Str) :-
-  maplist(dot_attribute, Attrs, AttrStrs),
-  atomics_to_string(AttrStrs, ",", AttrsStr),
-  format(string(Str), " [~s]", [AttrsStr]).
+dot_attributes(Options, Str) :-
+  maplist(dot_attribute, Options, Strs),
+  atomics_to_string(Strs, ",", Str0),
+  format(string(Str), " [~s]", [Str0]).
 
-dot_attribute(Attr, Str) :-
-  Attr =.. [Name,Value],
+dot_attribute(Option, Str) :-
+  Option =.. [Name,Value],
   dot_attribute(Name, Value, Str).
 
 % Multi-line label
 dot_attribute(label, Values, Str) :-
   is_list(Values), !,
   maplist(dot_label_string, Values, Strs),
-  atomics_to_string(Strs, "<BR/>", LabelStr),
-  format(string(Str), "label=<~s>", [LabelStr]).
+  atomics_to_string(Strs, "<BR/>", Str0),
+  format(string(Str), "label=<~s>", [Str0]).
 % Single-line label
 dot_attribute(label, Value, Str) :- !,
   dot_attribute(label, [Value], Str).
@@ -301,7 +302,7 @@ dot_label_string(Term, Str) :-
 
 
 %! dot_edge(+Out:stream, +FromTerm:term, +ToTerm:term) is det.
-%! dot_edge(+Out:stream, +FromTerm:term, +ToTerm:term, +Attributes:list(compound)) is det.
+%! dot_edge(+Out:stream, +FromTerm:term, +ToTerm:term, +Options:list(compound)) is det.
 %
 % Emits an edge between two Prolog terms in the DOT language.
 %
@@ -320,14 +321,14 @@ dot_edge(Out, FromTerm, ToTerm) :-
   dot_edge(Out, FromTerm, ToTerm, []).
 
 
-dot_edge(Out, FromTerm, ToTerm, Attrs) :-
+dot_edge(Out, FromTerm, ToTerm, Options) :-
   maplist(dot_id, [FromTerm,ToTerm], [FromId,ToId]),
-  dot_edge_id(Out, FromId, ToId, Attrs).
+  dot_edge_id(Out, FromId, ToId, Options).
 
 
 
 %! dot_edge_id(+Out:stream, +FromId:atom, +ToId:atom) is det.
-%! dot_edge_id(+Out:stream, +FromId:atom, +ToId:atom, +Attributes:list(compound)) is det.
+%! dot_edge_id(+Out:stream, +FromId:atom, +ToId:atom, +Options:list(compound)) is det.
 %
 % Emits an edge between two DOT IDs in the DOT language.
 %
@@ -337,8 +338,8 @@ dot_edge_id(Out, FromId, ToId) :-
   dot_edge_id(Out, FromId, ToId, []).
 
 
-dot_edge_id(Out, FromId, ToId, Attrs) :-
-  dot_attributes(Attrs, Str),
+dot_edge_id(Out, FromId, ToId, Options) :-
+  dot_attributes(Options, Str),
   format_debug(dot, Out, "  ~a -- ~a~s;", [FromId,ToId,Str]).
 
 
@@ -389,13 +390,13 @@ dot_id(Term, Id) :-
 
 
 %! dot_node(+Out:stream, +Term:term) is det.
-%! dot_node(+Out:stream, +Term:term, +Attributes:list(compound)) is det.
+%! dot_node(+Out:stream, +Term:term, +Options:list(compound)) is det.
 %
 % @arg Out is a handle to an output stream.
 %
 % @arg is a Prolog term.
 %
-% @arg Attributes is a list of compound terms, each of which denotes a
+% @arg Options is a list of compound terms, each of which denotes a
 % GraphViz attribute.  The following attributes are supported:
 %
 %   * label(+or([string,list(string)]))
@@ -421,14 +422,14 @@ dot_node(Out, Term) :-
   dot_node(Out, Term, [label(Term)]).
 
 
-dot_node(Out, Term, Attrs) :-
+dot_node(Out, Term, Options) :-
   dot_id(Term, Id),
-  dot_node_id(Out, Id, Attrs).
+  dot_node_id(Out, Id, Options).
 
 
 
 %! dot_node_id(+Out:stream, +Id:atom) is det.
-%! dot_node_id(+Out:stream, +Id:atom, +Attributes:list(compound)) is det.
+%! dot_node_id(+Out:stream, +Id:atom, +Options:list(compound)) is det.
 %
 % @see dot_node/[2,3] allows nodes to be asserted for Prolog terms.
 
@@ -436,8 +437,8 @@ dot_node_id(Out, Id) :-
   dot_node_id(Out, Id, []).
 
 
-dot_node_id(Out, Id, Attrs) :-
-  dot_attributes(Attrs, Str),
+dot_node_id(Out, Id, Options) :-
+  dot_attributes(Options, Str),
   format_debug(dot, Out, "  ~a~s;", [Id,Str]).
 
 
@@ -461,13 +462,15 @@ gv_format(Format) :-
 % to a file).
 
 gv_format_type(bmp,         binary).
-gv_format_type(canon,       text). % DOT, pretty-printed, no layout
-gv_format_type(cgimage,     binary). % CGImage, a drawable image object in Core Graphics (the low-level procedural drawing API for iOS and Mac OS X).
-gv_format_type(cmap,        text). % Client-side imagemap (deprecated)
-gv_format_type(cmapx,       text). % Server-side and client-side imagemap
-gv_format_type(cmapx_np,    text). % Server-side and client-side imagemap
-gv_format_type(dot,         text). % JSON version of `-Txdot' without layout
-gv_format_type(dot_json,    text). % JSON version of `-Tdot' without layout
+gv_format_type(canon,       text).   % DOT, pretty-printed, no layout.
+gv_format_type(cgimage,     binary). % CGImage, a drawable image object in Core
+                                     % Graphics (the low-level procedural
+                                     % drawing API for iOS and Mac OS X).
+gv_format_type(cmap,        text).   % Client-side imagemap (deprecated).
+gv_format_type(cmapx,       text).   % Server-side and client-side imagemap.
+gv_format_type(cmapx_np,    text).   % Server-side and client-side imagemap.
+gv_format_type(dot,         text).   % JSON version of `-Txdot' without layout.
+gv_format_type(dot_json,    text).   % JSON version of `-Tdot' without layout.
 gv_format_type(eps,         binary).
 gv_format_type(exr,         binary).
 gv_format_type(fig,         text).
@@ -475,23 +478,24 @@ gv_format_type(gd,          text).
 gv_format_type(gd2,         binary).
 gv_format_type(gif,         binary).
 gv_format_type(gtk,         viewer).
-gv_format_type(gv,          text). % Same as `dot'
+gv_format_type(gv,          text).   % Same as `dot'.
 gv_format_type(ico,         binary).
-gv_format_type(imap,        text). % Server-side and client-side imagemap
-gv_format_type(imap_np,     text). % Same as `imap'
-gv_format_type(ismap,       text). % Server-side and client-side imagemap (deprecated)
+gv_format_type(imap,        text).   % Server-side and client-side imagemap.
+gv_format_type(imap_np,     text).   % Same as `imap'.
+gv_format_type(ismap,       text).   % Server-side and client-side imagemap
+                                     % (deprecated).
 gv_format_type(jp2,         binary).
-gv_format_type(jpe,         binary). % same as `jpeg'
+gv_format_type(jpe,         binary). % Same as `jpeg'.
 gv_format_type(jpeg,        binary).
-gv_format_type(jpg,         binary). % same as `jpeg'
-gv_format_type(json,        text). % JSON version of `-Tdot'
-gv_format_type(json0,       text). % JSON version of `-Txdot'
+gv_format_type(jpg,         binary). % Same as `jpeg'.
+gv_format_type(json,        text).   % JSON version of `-Tdot'.
+gv_format_type(json0,       text).   % JSON version of `-Txdot'.
 gv_format_type(pct,         binary).
 gv_format_type(pdf,         binary).
 gv_format_type(pic,         text).
-gv_format_type(pict,        text). % same as `pic'
+gv_format_type(pict,        text).   % Same as `pic'.
 gv_format_type(plain,       text).
-gv_format_type('plain-ext', text). % same as `plain'
+gv_format_type('plain-ext', text).   % Same as `plain'.
 gv_format_type(png,         binary).
 gv_format_type(pov,         binary).
 gv_format_type(ps,          binary).

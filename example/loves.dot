@@ -1,0 +1,3 @@
+graph noname {
+  John -- Mary [label=loves];
+}

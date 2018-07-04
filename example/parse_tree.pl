@@ -2,12 +2,11 @@
 :- use_module(library(graph/graph_export)).
 :- use_module(library(yall)).
 
+test :-
+  export_tree(s(np(det(the),n(cat)),vp(v(loves),np(det(the),n(dog))))).
+
 export_tree(Tree) :-
-  export_graph(
-    'parse-tree.svg',
-    {Tree}/[Out]>>export_tree(Out, Tree, _),
-    [format(svg)]
-  ).
+  export_graph('parse_tree.svg', {Tree}/[Out]>>export_tree(Out, Tree, _)).
 
 export_tree(Out, Tree, Id) :-
   Tree =.. [Op|Trees],

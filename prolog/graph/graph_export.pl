@@ -57,7 +57,7 @@ Support for exporting graphs using the GraphViz DOT format.
     view_graph(1, +),
     write_graph(+, 1, +).
 
-:- setting(default_export_format, atom, pdf,
+:- setting(default_export_format, atom, svg,
            "The default format that is used when exporting a graph using GraphViz.").
 :- setting(default_method, atom, dot,
            "The default method that is used when creating a GraphViz visualization.").

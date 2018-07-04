@@ -13,26 +13,13 @@ A simple graph export library for SWI-Prolog.
 
 * Installation
 
-  1. Install [[http://www.swipl-prolog.org][SWI-Prolog]]
-
+  1. Install [[http://www.swipl-prolog.org][SWI-Prolog]].
   2. Install GraphViz:
-
-     #+BEGIN_SRC sh
-     $ sudo apt install graphviz # Debian-based distro's, e.g., Ubuntu
-     $ sudo dnf install graphviz # Red Hat-based distro's, e.g., Fedora
-     #+END_SRC
-
-  3. Start SWI-Prolog:
-
-     #+BEGIN_SRC prolog
-     $ swipl
-     #+END_SRC
-
-  4. Install this library by using the Prolog package installer:
-
-     #+BEGIN_SRC prolog
-     ?- pack_install(graph_export).
-     #+END_SRC
+    + ~$ sudo apt install graphviz~ on Debian-based distro's, e.g., Ubuntu.
+    + ~$ sudo dnf install graphviz~ on Red Hat-based distro's, e.g., Fedora.
+  3. Start SWI-Prolog: ~$ swipl~
+  4. Install this library by using the Prolog package installer: ~?-
+     pack_install(graph_export).~
 
 * Use
 
@@ -47,8 +34,9 @@ following command:
 
 The basic feature of this library is that it allows you to write to a
 GraphViz output file or to a GraphViz viewer by simply writing to a
-Prolog output stream.  The following example shows how to write one
-node, and open the result in a GraphViz viewer:
+Prolog output stream.  The following example shows how to write a
+graph consisting of one node, and open the result in a GraphViz
+viewer:
 
 #+BEGIN_SRC prolog
 ?- view_graph([Out]>>format(Out, "x [label=<Hello,<BR/>world!>]\n", [])).

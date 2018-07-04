@@ -75,8 +75,8 @@ Support for exporting graphs using the GraphViz DOT format.
 % @arg File is the name of the file to which the graph export is
 %      written.
 %
-% @arg Goal_1 is a goal that takes an output stream that accepts DOT
-%      formatted messages.
+% @arg Goal_1 is a unary goal that takes a Prolog output stream that
+%      receives DOT formatted messages.
 %
 % @arg Options is a list that may include any of the following
 %      options:
@@ -85,11 +85,6 @@ Support for exporting graphs using the GraphViz DOT format.
 %
 %        Whether the graph is directed (`true`) or undirected
 %        (`false`, default).
-%
-%      * overlap(+boolean)
-%
-%        Whether or not nodes are allowed to overlap.  Default is
-%        `false`.
 %
 %      * format(+atom)
 %
@@ -108,6 +103,11 @@ Support for exporting graphs using the GraphViz DOT format.
 %      * name(+atom)
 %
 %        The name of the graph.  Default is `noname`.
+%
+%      * overlap(+boolean)
+%
+%        Whether or not nodes are allowed to overlap.  Default is
+%        `false`.
 
 export_graph(File, Goal_1) :-
   export_graph(File, Goal_1, []).
@@ -189,39 +189,22 @@ write_graph_attributes(Out, Options) :-
 % Generate a GraphViz graph visualization and open the result in a
 % viewer application.
 %
-% @arg Options is a list that may include any of the following
-%      options:
+% @arg Goal_1 is a unary goal that takes a Prolog output stream that
+%      receives DOT formatted messages.
 %
-%      * directed(+Directed:boolean)
-%
-%        Whether the graph is directed (`true`) or undirected
-%        (`false`, default).
-%
-%      * format(+Format:atom)
-%
-%        The format that is used to store the output in.  Both binary
-%        and text output formats are supported.  See
-%        `gv_format_type(-Format, Type), memberchk(Type,
-%        [binary,text])` for possible values.  The default value is
-%        stored in setting `default_export_format`.
-%
-%      * method(+Method:atom)
-%
-%        The method that is used by GraphViz to calculate the graph
-%        layout.  See `gv_method(-Method)` for possible values.  The
-%        default value is stored in setting `default_method`.
+% @arg Options is a list that may include any of the options defined
+%      for export_graph/3.
 
 view_graph(Goal_1) :-
   view_graph(Goal_1, []).
 
 
 view_graph(Goal_1, Options) :-
-  option(directed(Directed), Options, false),
   view_format_option(Format, Options),
   method_option(Method, Options),
   setup_call_cleanup(
     process_create(path(Method), ['-T',Format], [stdin(pipe(ProcIn))]),
-    write_graph(Directed, Goal_1, ProcIn),
+    write_graph(ProcIn, Goal_1, Options),
     close(ProcIn)
   ).
 

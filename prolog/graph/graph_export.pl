@@ -178,9 +178,10 @@ graph_type(false, graph).
 graph_type(true, digraph).
 
 write_graph_attributes(Out, Options) :-
-  option(overlap(Overlap), Options, false),
+  option(overlap(Overlap), Options), !,
   must_be(boolean, Overlap),
   format_debug(dot, Out, "  graph [overlap=~a];", [Overlap]).
+write_graph_attributes(_, _).
 
 
 

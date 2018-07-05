@@ -37,7 +37,7 @@ graph consisting of one node, and open the result in a GraphViz
 viewer:
 
 #+BEGIN_SRC prolog
-?- view_graph([Out]>>format(Out, "x [label=<Hello,<BR/>world!>]\n", [])).
+?- view_graph([Out]>>format(Out, "x [label=<Hello,<BR/>world!>,shape=diamond];\n", [])).
 #+END_SRC
 
 This opens the following image inside a GraphViz-compatible viewer:

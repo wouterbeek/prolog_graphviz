@@ -3,31 +3,38 @@
 :- use_module(library(apply)).
 :- use_module(library(graph/graph_export)).
 :- use_module(library(plunit)).
+:- use_module(library(process)).
 :- use_module(library(yall)).
+
+:- meta_predicate
+    test_export_graph(+, 1),
+    test_export_graph(+, 1, +).
+
+
 
 
 
 test(hello, [cleanup(delete_file(File))]) :-
-  File = 'hello.svg',
-  export_graph(
+  File = 'hello.pdf',
+  test_export_graph(
     File,
-    [Out]>>format(Out, "x [label=<Hello,<BR/>world!>]\n", [])
+    [Out]>>format(Out, "x [label=<Hello,<BR/>world!>,shape=diamond];\n", [])
   ).
 
 
 
 test(hello2, [cleanup(delete_file(File))]) :-
-  File = 'hello2.svg',
-  export_graph(
+  File = 'hello2.pdf',
+  test_export_graph(
     File,
-    [Out]>>dot_node(Out, hello, [label(["Hello,","world!"])])
+    [Out]>>dot_node(Out, hello, [label(["Hello,","world!"]),shape(diamond)])
   ).
 
 
 
 test(loves, [cleanup(delete_file(File))]) :-
   File = 'loves.svg',
-  export_graph(
+  test_export_graph(
     File,
     [Out]>>format(Out, "John -- Mary [label=loves]", [])
   ).
@@ -36,10 +43,8 @@ test(loves, [cleanup(delete_file(File))]) :-
 
 test(parse_tree, [cleanup(delete_file(File))]) :-
   File = 'parse_tree.svg',
-  export_tree(File, s(np(det(the),n(cat)),vp(v(loves),np(det(the),n(dog))))).
-
-export_tree(File, Tree) :-
-  export_graph(File, {Tree}/[Out]>>export_tree_(Out, Tree, _)).
+  Tree = s(np(det(the),n(cat)),vp(v(loves),np(det(the),n(dog)))),
+  test_export_graph(File, {Tree}/[Out]>>export_tree_(Out, Tree, _)).
 
 export_tree_(Out, Tree, Id) :-
   Tree =.. [Op|Trees],
@@ -52,14 +57,9 @@ export_tree_(Out, Tree, Id) :-
 
 test(proof_tree, [cleanup(delete_file(File))]) :-
   File = 'proof_tree.svg',
-  export_proof(
-    File,
-    t(rdfs(3),≡(class,class),[t(axiom(rdfs),range(range,class),[]),
-                              t(axiom(rdfs),range(⊆,class),[])])
-  ).
-
-export_proof(File, Proof) :-
-  export_graph(
+  Proof = t(rdfs(3),≡(class,class),[t(axiom(rdfs),range(range,class),[]),
+                                    t(axiom(rdfs),range(⊆,class),[])]),
+  test_export_graph(
     File,
     {Proof}/[Out]>>export_proof_(Out, Proof),
     [directed(true)]
@@ -77,5 +77,30 @@ export_subproof_(Out, Node, Tree) :-
   dot_node(Out, Concl),
   dot_arc(Out, Node, Concl),
   export_proof_(Out, Tree).
+
+
+
+
+
+% HELPERS %
+
+%! open_pdf(+File:atom) is det.
+
+open_pdf(File) :-
+  process_create(path(evince), [file(File)], []).
+
+
+
+%! test_export_graph(+File:atom, :Goal_1) is det.
+%! test_export_graph(+File:atom, :Goal_1, +Options:list(compound)) is det.
+
+test_export_graph(File, Goal_1) :-
+  test_export_graph(File, Goal_1, []).
+
+
+test_export_graph(File, Goal_1, Options0) :-
+  merge_options(Options0, [format(pdf)], Options),
+  export_graph(File, Goal_1, Options),
+  open_pdf(File).
 
 :- end_tests(graph_export).

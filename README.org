@@ -1,13 +1,11 @@
 #+author: Wouter Beek
 #+title: ~graph_export~
-
-#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="/home/wbeek/Git/org-html-themes/styles/readtheorg/css/htmlize.css"/>
-#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="/home/wbeek/Git/org-html-themes/styles/readtheorg/css/readtheorg.css"/>
-
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="https://www.pirilampo.org/styles/readtheorg/css/htmlize.css"/>
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="https://www.pirilampo.org/styles/readtheorg/css/readtheorg.css"/>
 #+HTML_HEAD: <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
 #+HTML_HEAD: <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
-#+HTML_HEAD: <script type="text/javascript" src="/home/wbeek/Git/org-html-themes/styles/lib/js/jquery.stickytableheaders.min.js"></script>
-#+HTML_HEAD: <script type="text/javascript" src="/home/wbeek/Git/org-html-themes/styles/readtheorg/js/readtheorg.js"></script>
+#+HTML_HEAD: <script type="text/javascript" src="https://www.pirilampo.org/styles/lib/js/jquery.stickytableheaders.js"></script>
+#+HTML_HEAD: <script type="text/javascript" src="https://www.pirilampo.org/styles/readtheorg/js/readtheorg.js"></script>
 
 A simple graph export library for SWI-Prolog.
 
@@ -230,72 +228,72 @@ The following GraphViz output formats are supported.  They can be
 specified with the ~format(+atom)~ option in ~export_graph/[2,3]~ and
 ~view_graph/[1,2]~.
 
-| *Extension* | *Type* | *Description*                                                                                                                         |
-|-------------+--------+---------------------------------------------------------------------------------------------------------------------------------------|
-| ~bmp~       | binary | Windows Bitmap (BMP)                                                                                                                  |
-| ~canon~     | text   | TODO                                                                                                                                  |
-| ~cgimage~   | binary | CGImage, a drawable image object in Core Graphics (the low-level procedural drawing API for iOS and Mac OS X).                        |
-| ~cmap~      | text   | TODO                                                                                                                                  |
-| ~cmapx~     | text   | TODO                                                                                                                                  |
-| ~cmapx_np~  | text   | TODO                                                                                                                                  |
-| ~dot~       | text   | TODO                                                                                                                                  |
-| ~dot_json~  | text   | TODO                                                                                                                                  |
-| ~eps~       | binary | Encapsulated PostScript (EPS)                                                                                                         |
-| ~exr~       | binary | OpenEXR: a high dynamic-range (HDR) image file format developed by Industrial Light & Magic for use in computer imaging applications. |
-| ~fig~       | text   | FIG graphics format used by Xfig                                                                                                      |
-| ~gd~        | text   | TODO                                                                                                                                  |
-| ~gd2~       | binary | TODO                                                                                                                                  |
-| ~gif~       | binary | Graphics Interchange Format (GIF)                                                                                                     |
-| ~gtk~       | viewer | TODO                                                                                                                                  |
-| ~gv~        | text   | Same as ~dot~                                                                                                                         |
-| ~ico~       | binary | TODO                                                                                                                                  |
-| ~imap~      | text   | TODO                                                                                                                                  |
-| ~imap_np~   | text   | TODO                                                                                                                                  |
-| ~ismap~     | text   | HTML image map                                                                                                                        |
-| ~jp2~       | binary | JPEG 2000                                                                                                                             |
-| ~jpe~       | binary | Same as ~jpeg~                                                                                                                        |
-| ~jpeg~      | binary | JPEG                                                                                                                                  |
-| ~jpg~       | binary | Same as ~jpeg~                                                                                                                        |
-| ~json~      | text   | TODO                                                                                                                                  |
-| ~json0~     | text   | TODO                                                                                                                                  |
-| ~pct~       | binary | PICT: A graphics file format introduced on the original Apple Macintosh computer as its standard metafile format.                     |
-| ~pdf~       | binary | Portable Document Format (PDF)                                                                                                        |
-| ~pic~       | text   | PIC language developed for troff                                                                                                      |
-| ~pict~      | text   | Same as ~pic~                                                                                                                         |
-| ~plain~     | text   | TODO                                                                                                                                  |
-| ~plain-ext~ | text   | TODO                                                                                                                                  |
-| ~png~       | text   | PNG                                                                                                                                   |
-| ~pov~       | binary | Scene-description language for 3D modelling for the Persistence of Vision Raytracer                                                   |
-| ~ps~        | binary | PostScript                                                                                                                            |
-| ~ps2~       | binary | PostScript output with PDF notations                                                                                                  |
-| ~psd~       | binary | Adobe Photoshop PSD                                                                                                                   |
-| ~sgi~       | binary | Silicon Graphis Image (SGI)                                                                                                           |
-| ~svg~       | text   | Scalable Vector Graphics (SVG)                                                                                                        |
-| ~svgz~      | binary | GNU zipped SVG                                                                                                                        |
-| ~tga~       | binary | Truevision Advanced Raster Graphics Adapter (TARGA)                                                                                   |
-| ~tif~       | binary | Same as ~tiff~                                                                                                                        |
-| ~tiff~      | binary | TIFF                                                                                                                                  |
-| ~tk~        | text   | TK graphics primitives                                                                                                                |
-| ~vdx~       | text   | Microsoft Visio XML drawing                                                                                                           |
-| ~vml~       | text   | Vector Markup Lanuage (VML)                                                                                                           |
-| ~vmlz~      | binary | GNU zipped VML                                                                                                                        |
-| ~vrml~      | text   | Virtual Reality Modeling Language (VRML)                                                                                              |
-| ~wbmp~      | binary | Wireless Application Protocol Bitmap Format (WBMP)                                                                                    |
-| ~webp~      | binary | Google image format for the web (WebP)                                                                                                |
-| ~x11~       | viewer | X11                                                                                                                                   |
-| ~xdot~      | text   | TODO                                                                                                                                  |
-| ~xdot_json~ | text   | TODO                                                                                                                                  |
-| ~xdot1.2~   | text   | TODO                                                                                                                                  |
-| ~xdot1.4~   | text   | TODO                                                                                                                                  |
-| ~xlib~      | viewer | TODO                                                                                                                                  |
+| *Extension* | *Type* | *Media Type*                                               | *Description*                                                                                                                         |
+|-------------+--------+------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------|
+| ~bmp~       | binary | ~image/bmp~                                                | Windows Bitmap (BMP)                                                                                                                  |
+| ~canon~     | text   |                                                            | A prettyprinted version of the DOT input, with no layout performed.                                                                   |
+| ~cgimage~   | binary |                                                            | CGImage, a drawable image object in Core Graphics (the low-level procedural drawing API for iOS and Mac OS X).                        |
+| ~cmap~      | text   |                                                            | Client-side image map files.  Not well-formed XML.                                                                                    |
+| ~cmapx~     | text   |                                                            | Server-side and client-side image map files.  Well-formed XML.                                                                        |
+| ~cmapx_np~  | text   |                                                            | Like ~cmapx~, but only using rectangles as active areas.                                                                              |
+| ~dot~       | text   | ~test/vnd.graphviz~                                        | Reproduces the DOT input, along with layout information.                                                                              |
+| ~dot_json~  | text   | ~application/json~                                         | JSON representation of the content (i.e., non-layout) information of the ~dot~ format.                                                |
+| ~eps~       | binary | ~image/eps~                                                | Encapsulated PostScript (EPS)                                                                                                         |
+| ~exr~       | binary |                                                            | OpenEXR: a high dynamic-range (HDR) image file format developed by Industrial Light & Magic for use in computer imaging applications. |
+| ~fig~       | text   |                                                            | FIG graphics format used by Xfig.                                                                                                     |
+| ~gd~        | text   |                                                            | GD format (~libgd~).                                                                                                                  |
+| ~gd2~       | binary |                                                            | GD2 format (~libgd~, compressed)                                                                                                      |
+| ~gif~       | binary | ~image/gif~                                                | Graphics Interchange Format (GIF)                                                                                                     |
+| ~gtk~       | viewer |                                                            | GTK-based viewer                                                                                                                      |
+| ~gv~        | text   |                                                            | Same as ~dot~.                                                                                                                        |
+| ~ico~       | binary | ~image/vnd.microsoft.icon~                                 | Windows icon format                                                                                                                   |
+| ~imap~      | text   |                                                            | Same as ~cmapx~.                                                                                                                      |
+| ~imap_np~   | text   |                                                            | Same as ~cmapx_np~.                                                                                                                   |
+| ~ismap~     | text   |                                                            | HTML image map                                                                                                                        |
+| ~jp2~       | binary | ~image/jp2~                                                | JPEG 2000                                                                                                                             |
+| ~jpe~       | binary | ~image/jpeg~                                               | Same as ~jpeg~.                                                                                                                       |
+| ~jpeg~      | binary | ~image/jpeg~                                               | Joint Photographic Experts Group (JPEG)                                                                                               |
+| ~jpg~       | binary | ~image/jpeg~                                               | Same as ~jpeg~.                                                                                                                       |
+| ~json~      | text   | ~application/json~                                         | JSON representation of the content an layout information of the ~xdot~ format.                                                        |
+| ~json0~     | text   | ~application/json~                                         | JSON representation of the content an layout information of the ~dot~ format.                                                         |
+| ~pct~       | binary | ~image/x-pict~                                             | PICT: A graphics file format introduced on the original Apple Macintosh computer as its standard metafile format.                     |
+| ~pdf~       | binary | ~application/pdf~                                          | Portable Document Format (PDF)                                                                                                        |
+| ~pic~       | text   |                                                            | PIC language developed for troff.                                                                                                     |
+| ~pict~      | text   |                                                            | Same as ~pic~.                                                                                                                        |
+| ~plain~     | text   |                                                            | A simple, line-based language.                                                                                                        |
+| ~plain-ext~ | text   |                                                            | Like ~plain~, but providing port names on head and tail nodes when applicable.                                                        |
+| ~png~       | text   | ~image/png~                                                | Portable Network Graphics (PNG)                                                                                                       |
+| ~pov~       | binary |                                                            | Scene-description language for 3D modelling for the Persistence of Vision Raytracer.                                                  |
+| ~ps~        | binary | ~application/postscript~                                   | PostScript                                                                                                                            |
+| ~ps2~       | binary |                                                            | PostScript output with PDF notations                                                                                                  |
+| ~psd~       | binary | ~image/vnd.adobe.photoshop~                                | Adobe Photoshop PSD                                                                                                                   |
+| ~sgi~       | binary | ~image/sgi~                                                | Silicon Graphis Image (SGI)                                                                                                           |
+| ~svg~       | text   | ~image/svg+xml~                                            | Scalable Vector Graphics (SVG)                                                                                                        |
+| ~svgz~      | binary | ~application/gzip~                                         | GNU zipped SVG                                                                                                                        |
+| ~tga~       | binary | ~image/x-targa~                                            | Truevision Advanced Raster Graphics Adapter (TARGA)                                                                                   |
+| ~tif~       | binary | ~image/tiff~                                               | Same as ~tiff~.                                                                                                                       |
+| ~tiff~      | binary | ~image/tiff~                                               | Tagged Image File Format (TIFF)                                                                                                       |
+| ~tk~        | text   |                                                            | TK graphics primitives                                                                                                                |
+| ~vdx~       | text   |                                                            | Microsoft Visio XML drawing                                                                                                           |
+| ~vml~       | text   | ~application/vnd.openxmlformats-officedocument.vmlDrawing~ | Vector Markup Lanuage (VML)                                                                                                           |
+| ~vmlz~      | binary |                                                            | GNU zipped VML                                                                                                                        |
+| ~vrml~      | text   | ~model/vrml~                                               | Virtual Reality Modeling Language (VRML)                                                                                              |
+| ~wbmp~      | binary | ~image/vnd.wap.wbmp~                                       | Wireless Application Protocol Bitmap Format (WBMP)                                                                                    |
+| ~webp~      | binary | ~image/webp~                                               | Google image format for the web (WebP)                                                                                                |
+| ~x11~       | viewer |                                                            | X11-based viewer                                                                                                                      |
+| ~xdot~      | text   |                                                            | Like ~dot~, but adding more detailed information about how graph components are drawn.                                                |
+| ~xdot_json~ | text   | ~application/json~                                         | JSON representation of the content (i.e., non-layout) information of the ~xdot~ format.                                               |
+| ~xdot1.2~   | text   |                                                            | Same as setting ~xdotversion=1.2~ with the ~xdot~ format.                                                                             |
+| ~xdot1.4~   | text   |                                                            | Same as setting ~xdotversion=1.4~ with the ~xdot~ format.                                                                             |
+| ~xlib~      | viewer |                                                            | X11-based viewer                                                                                                                      |
 
 * HTML-like labels
 
 The DOT language supports several HTML-like facilities that allow rich
 labels to be printed for arcs, edges, and nodes.  These can be
-specified by option ~label(+Label)~, which takes either a string or a
-list of strings.  In a list of strings, each string represents one
-line in a multi-line label.
+specified by option ~label(+or([string,list(string)]))~, which takes
+either a string or a list of strings.  In a list of strings, each
+string represents one line in a multi-line label.
 
 Strings must adhere to the following BNF grammar for DOT HTML-like
 labels:
@@ -331,36 +329,36 @@ In addition to the above BNF grammar, tags are allowed to have
 attributes that are formatted similar to HTML attributes.  Different
 tags support different sets of attributes:
 
-*** Supported attributes for ~TABLE~
+** Supported attributes for ~TABLE~
 
-  - `ALIGN="CENTER|LEFT|RIGHT"`
-  - `BGCOLOR="color"`
-  - `BORDER="value"`
-  - `CELLBORDER="value"`
-  - `CELLPADDING="value"`
-  - `CELLSPACING="value"`
-  - `COLOR="color"`
-  - `COLUMNS="value"`
-  - `FIXEDSIZE="FALSE|TRUE"`
-  - `GRADIENTANGLE="value"`
-  - `HEIGHT="value"`
-  - `HREF="value"`
-  - `ID="value"`
-  - `PORT="portName"`
-  - `ROWS="value"`
-  - `SIDES="value"`
-  - `STYLE="value"`
-  - `TARGET="value"`
-  - `TITLE="value"`
-  - `TOOLTIP="value"`
-  - `VALIGN="MIDDLE|BOTTOM|TOP"`
-  - `WIDTH="value"`
+  - ~ALIGN="CENTER|LEFT|RIGHT"~
+  - ~BGCOLOR="color"~
+  - ~BORDER="value"~
+  - ~CELLBORDER="value"~
+  - ~CELLPADDING="value"~
+  - ~CELLSPACING="value"~
+  - ~COLOR="color"~
+  - ~COLUMNS="value"~
+  - ~FIXEDSIZE="FALSE|TRUE"~
+  - ~GRADIENTANGLE="value"~
+  - ~HEIGHT="value"~
+  - ~HREF="value"~
+  - ~ID="value"~
+  - ~PORT="portName"~
+  - ~ROWS="value"~
+  - ~SIDES="value"~
+  - ~STYLE="value"~
+  - ~TARGET="value"~
+  - ~TITLE="value"~
+  - ~TOOLTIP="value"~
+  - ~VALIGN="MIDDLE|BOTTOM|TOP"~
+  - ~WIDTH="value"~
 
-*** Supported attributes for ~BR~
+** Supported attributes for ~BR~
 
   - ~ALIGN="CENTER|LEFT|RIGHT"~
 
-*** Supported attributes for ~FONT~
+** Supported attributes for ~FONT~
 
   - ~COLOR="color"~
 
@@ -377,12 +375,12 @@ tags support different sets of attributes:
 
   - ~POINT-SIZE="value"~
 
-*** Supported attributes for ~IMG~
+** Supported attributes for ~IMG~
 
   - ~SCALE="FALSE|TRUE|WIDTH|HEIGHT|BOTH"~
   - ~SRC="value"~
 
-*** Supported attributes for ~TD~
+** Supported attributes for ~TD~
 
   - ~ALIGN="CENTER|LEFT|RIGHT|TEXT"~
   - ~BALIGN="CENTER|LEFT|RIGHT"~

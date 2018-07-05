@@ -515,7 +515,7 @@ gv_format_type(vmlz,        binary).
 gv_format_type(vrml,        text).
 gv_format_type(wbmp,        binary).
 gv_format_type(webp,        binary).
-gv_format_type(x11,         none).
+gv_format_type(x11,         viewer).
 gv_format_type(xdot,        text).
 gv_format_type(xdot_json,   text).
 gv_format_type('xdot1.2',   text).

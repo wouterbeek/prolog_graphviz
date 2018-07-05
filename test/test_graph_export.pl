@@ -68,7 +68,7 @@ test(proof_tree, [cleanup(delete_file(File))]) :-
 export_proof_(Out, Tree) :-
   Tree = t(Rule,Concl,Prems),
   dot_node(Out, Concl),
-  dot_node(Out, Tree, [label(Rule)]),
+  dot_node(Out, Tree, [color(green),label(Rule)]),
   dot_arc(Out, Concl, Tree),
   maplist(export_subproof_(Out, Tree), Prems).
 

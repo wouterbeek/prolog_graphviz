@@ -42,9 +42,7 @@ viewer:
 
 This opens the following image inside a GraphViz-compatible viewer:
 
-#+BEGIN_EXPORT html
-<img style="width: 350px;" src="./example/hello.svg">
-#+END_EXPORT
+[[./example/hello.svg]]
 
 ** Exporting a single edge
 
@@ -57,9 +55,7 @@ In this example we write a graph that consists of a single edge:
 This writes the following image to an SVG file.  See the table in
 Section [[Output formats]] for a full list of supported output formats.
 
-#+BEGIN_EXPORT html
-<img style="width: 250px;" src="./example/loves.svg">
-#+END_EXPORT
+[[./example/loves.svg]]
 
 * Advanced usage
 
@@ -104,7 +100,7 @@ view_proof(Proof) :-
 export_proof(Out, Tree) :-
   Tree = t(Rule,Concl,Prems),
   dot_node(Out, Concl),
-  dot_node(Out, Tree, [label(Rule)]),
+  dot_node(Out, Tree, [color(green),label(Rule)]),
   dot_arc(Out, Concl, Tree),
   maplist(export_subproof(Out, Tree), Prems).
 
@@ -127,9 +123,7 @@ GraphViz-compatible viewer, we make the following call:
 
 This produces the following visualization:
 
-#+BEGIN_EXPORT html
-<img style="width: 650px;" src="./example/proof_tree.svg">
-#+END_EXPORT
+[[./example/proof_tree.svg]]
 
 ** Exporting parse trees
 
@@ -172,9 +166,7 @@ by making the following call:
 
 This prodices the following result:
 
-#+BEGIN_EXPORT html
-<img style="width: 650px;" src="./example/parse_tree.svg">
-#+END_EXPORT
+[[./example/parse_tree.svg]]
 
 Notice that we create a new DOT ID (~dot_id/1~) for each node in the
 tree.  Because of this, the two occurrences of ‘the’ can be
@@ -200,12 +192,12 @@ top-level for inspection by the programmer.  Printing the export to
 the top-level can be enabled with ~debug(dot)~, and disabled by
 ~nodebug(dot)~ (see library debug for more information).
 
-* Enumerations
+* Options
 
 This section gives a full enumeration of the values that are supported
-by this library.
+by this library's options.
 
-** Layout methods
+** Layout methods (~method/1~)
 
 The followig GraphViz layout methods are supported.  They can be
 specified with the ~method(+atom)~ option in ~export_graph/[2,3]~ and
@@ -222,7 +214,7 @@ specified with the ~method(+atom)~ option in ~export_graph/[2,3]~ and
 | ~sfdp~      | Large undirected graphs. |
 | ~twopi~     | Radial graph layouts.    |
 
-** Output formats
+** Output formats (~format/1~)
 
 The following GraphViz output formats are supported.  They can be
 specified with the ~format(+atom)~ option in ~export_graph/[2,3]~ and

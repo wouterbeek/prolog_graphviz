@@ -2,7 +2,7 @@
 :- use_module(library(graph/graph_export)).
 :- use_module(library(yall)).
 
-test :-
+run :-
   view_proof(
     t(rdfs(3),≡(class,class),[t(axiom(rdfs),range(range,class),[]),
                               t(axiom(rdfs),range(⊆,class),[])])

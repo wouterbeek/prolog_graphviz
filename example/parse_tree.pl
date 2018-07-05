@@ -2,7 +2,7 @@
 :- use_module(library(graph/graph_export)).
 :- use_module(library(yall)).
 
-test :-
+run :-
   export_tree(s(np(det(the),n(cat)),vp(v(loves),np(det(the),n(dog))))).
 
 export_tree(Tree) :-
@@ -10,7 +10,7 @@ export_tree(Tree) :-
 
 export_tree(Out, Tree, Id) :-
   Tree =.. [Op|Trees],
-  gv_id(Id),
-  gv_node_id(Out, Id, [label(Op)]),
+  dot_id(Id),
+  dot_node_id(Out, Id, [label(Op)]),
   maplist(export_tree(Out), Trees, Ids),
-  maplist(gv_edge_id(Out, Id), Ids).
+  maplist(dot_edge_id(Out, Id), Ids).

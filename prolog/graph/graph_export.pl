@@ -49,6 +49,11 @@ Support for exporting graphs using the GraphViz DOT format.
 :- use_module(library(uuid)).
 :- use_module(library(yall)).
 
+:- discontiguous
+    gv_format_synonym__/2,
+    gv_format_type__/2,
+    gv_format_type__/3.
+
 :- meta_predicate
     call_must_be(1, +),
     export_graph(+, 1),
@@ -61,7 +66,7 @@ Support for exporting graphs using the GraphViz DOT format.
            "The default format that is used when exporting a graph using GraphViz.").
 :- setting(default_method, atom, dot,
            "The default method that is used when creating a GraphViz visualization.").
-:- setting(default_view_format, atom, gtk,
+:- setting(default_view_format, atom, x11,
            "The default format that is used when viewing a graph using GraphViz.").
 
 
@@ -115,7 +120,7 @@ export_graph(File, Goal_1) :-
 
 
 export_graph(File, Goal_1, Options) :-
-  export_format_option(Format, Type, Options),
+  export_format_option(File, Format, Type, Options),
   method_option(Method, Options),
   setup_call_cleanup(
     open(File, write, Out, [type(Type)]),
@@ -144,17 +149,22 @@ export_graph(File, Goal_1, Options) :-
     close(Out)
   ).
 
-export_format_option(Format, Type, Options) :-
-  (   option(format(Format), Options)
-  ->  true
-  ;   setting(default_export_format, Format)
-  ),
-  call_must_be(export_format, Format),
-  gv_format_type(Format, Type).
+%! export_format_option(+File:atom, -Format:atom, -Type:oneof([binary,text]),
+%!                      +Options:list(compound)) is det.
 
-export_format(Format) :-
-  gv_format_type(Format, Type),
-  memberchk(Type, [binary,text]).
+export_format_option(File, Format, Type, Options) :-
+  export_format(File, Format, Options),
+  (   gv_format_type(Format, Type)
+  ->  memberchk(Type, [binary,text])
+  ;   type_error(export_format, Format)
+  ).
+
+export_format(_, Format, Options) :-
+  option(format(Format), Options), !.
+export_format(File, Format, _) :-
+  file_name_extension(_, Format, File), !.
+export_format(_, Format, _) :-
+  setting(default_export_format, Format).
 
 method_option(Method, Options) :-
   (   option(method(Method), Options)
@@ -447,80 +457,107 @@ dot_node_id(Out, Id, Options) :-
 
 
 % GRAPHVIZ FORMATS/METHODS %
-
-%! gv_format(?Format:atom) is nondet.
-
-gv_format(Format) :-
-  gv_format_type(Format, _).
-
-
-
-%! gv_format_type(?Format:atom, ?Type:oneof([binary,text,viewer])) is nondet.
 %
 % GraphViz provides two types of export: binary (e.g., `jpeg`) and
 % text (e.g., `svg`).  The third type `viewer` is use to directly open
 % GraphViz output in a viewer application (without storing the result
 % to a file).
 
-gv_format_type(bmp,         binary).
-gv_format_type(canon,       text).   % DOT, pretty-printed, no layout.
-gv_format_type(cgimage,     binary). % CGImage, a drawable image object in Core
-                                     % Graphics (the low-level procedural
-                                     % drawing API for iOS and Mac OS X).
-gv_format_type(cmap,        text).   % Client-side imagemap (deprecated).
-gv_format_type(cmapx,       text).   % Server-side and client-side imagemap.
-gv_format_type(cmapx_np,    text).   % Server-side and client-side imagemap.
-gv_format_type(dot,         text).   % JSON version of `-Txdot' without layout.
-gv_format_type(dot_json,    text).   % JSON version of `-Tdot' without layout.
-gv_format_type(eps,         binary).
-gv_format_type(exr,         binary).
-gv_format_type(fig,         text).
-gv_format_type(gd,          text).
-gv_format_type(gd2,         binary).
-gv_format_type(gif,         binary).
-gv_format_type(gtk,         viewer).
-gv_format_type(gv,          text).   % Same as `dot'.
-gv_format_type(ico,         binary).
-gv_format_type(imap,        text).   % Server-side and client-side imagemap.
-gv_format_type(imap_np,     text).   % Same as `imap'.
-gv_format_type(ismap,       text).   % Server-side and client-side imagemap
-                                     % (deprecated).
-gv_format_type(jp2,         binary).
-gv_format_type(jpe,         binary). % Same as `jpeg'.
-gv_format_type(jpeg,        binary).
-gv_format_type(jpg,         binary). % Same as `jpeg'.
-gv_format_type(json,        text).   % JSON version of `-Tdot'.
-gv_format_type(json0,       text).   % JSON version of `-Txdot'.
-gv_format_type(pct,         binary).
-gv_format_type(pdf,         binary).
-gv_format_type(pic,         text).
-gv_format_type(pict,        text).   % Same as `pic'.
-gv_format_type(plain,       text).
-gv_format_type('plain-ext', text).   % Same as `plain'.
-gv_format_type(png,         binary).
-gv_format_type(pov,         binary).
-gv_format_type(ps,          binary).
-gv_format_type(ps2,         binary). % PostScript output with PDF notations.
-gv_format_type(psd,         binary).
-gv_format_type(sgi,         binary).
-gv_format_type(svg,         text).
-gv_format_type(svgz,        binary).
-gv_format_type(tga,         binary).
-gv_format_type(tif,         binary).
-gv_format_type(tiff,        binary).
-gv_format_type(tk,          text).
-gv_format_type(vdx,         text).
-gv_format_type(vml,         text).
-gv_format_type(vmlz,        binary).
-gv_format_type(vrml,        text).
-gv_format_type(wbmp,        binary).
-gv_format_type(webp,        binary).
-gv_format_type(x11,         viewer).
-gv_format_type(xdot,        text).
-gv_format_type(xdot_json,   text).
-gv_format_type('xdot1.2',   text).
-gv_format_type('xdot1.4',   text).
-gv_format_type(xlib,        none).
+%! gv_format(+Format:atom) is semidet.
+%! gv_format(-Format:atom) is nondet.
+
+gv_format(Format) :-
+  gv_format_type(Format, _).
+
+
+
+%! gv_format_type(+Format:atom, +Type:oneof([binary,text,viewer])) is semidet.
+%! gv_format_type(+Format:atom, -Type:oneof([binary,text,viewer])) is det.
+%! gv_format_type(-Format:atom, +Type:oneof([binary,text,viewer])) is multi.
+%! gv_format_type(-Format:atom, -Type:oneof([binary,text,viewer])) is nondet.
+
+gv_format_type(Format1, Type) :-
+  gv_format_synonym_(Format1, Format2),
+  gv_format_type_(Format2, Type).
+
+gv_format_synonym_(Format1, Format2) :-
+  gv_format_synonym__(Format1, Format2).
+gv_format_synonym_(Format, Format).
+
+gv_format_type_(Format, Type) :-
+  gv_format_type__(Format, Type).
+gv_format_type_(Format, Type) :-
+  gv_format_type__(Format, Type, _).
+
+gv_format_type__(bmp, binary, media(image/bmp,[])).
+% DOT, pretty-printed, no layout.
+gv_format_type__(canon, text).
+% CGImage, a drawable image object in Core Graphics (the low-level
+% procedural drawing API for iOS and Mac OS X).
+gv_format_type__(cgimage, binary).
+% Client-side imagemap (deprecated).
+gv_format_type__(cmap, text).
+% Server-side and client-side imagemap.
+gv_format_type__(cmapx, text).
+% Server-side and client-side imagemap.
+gv_format_type__(cmapx_np, text).
+% JSON version of `-Txdot' without layout.
+gv_format_type__(dot, text, media(text/'vnd.graphviz',[])).
+% JSON version of `-Tdot' without layout.
+gv_format_type__(dot_json, text, media(application/json,[])).
+gv_format_type__(eps, binary, media(image/eps,[])).
+gv_format_type__(exr, binary).
+gv_format_type__(fig, text).
+gv_format_type__(gd, text).
+gv_format_type__(gd2, binary).
+gv_format_type__(gif, binary, media(image/gif,[])).
+gv_format_type__(gtk, viewer).
+gv_format_synonym__(gv, dot).
+gv_format_type__(ico, binary, media(image/'vnd.microsoft.icon')).
+% Server-side and client-side imagemap.
+gv_format_type__(imap, text).
+gv_format_synonym__(imap_np, imap).
+% Server-side and client-side imagemap (deprecated).
+gv_format_type__(ismap, text).
+gv_format_type__(jp2, binary, media(image/jp2,[])).
+gv_format_synonym__(jpe, jpeg).
+gv_format_type__(jpeg, binary, media(image/jpeg,[])).
+gv_format_synonym__(jpg, jpeg).
+% JSON version of `-Tdot'.
+gv_format_type__(json, text, media(application/json,[])).
+% JSON version of `-Txdot'.
+gv_format_type__(json0, text, media(application/json,[])).
+gv_format_type__(pct, binary, media(image/'x-pict',[])).
+gv_format_type__(pdf, binary, media(application/pdf,[])).
+gv_format_type__(pic, text).
+gv_format_synonym__(pict, pic).
+gv_format_type__(plain, text).
+gv_format_synonym__('plain-ext', plain).
+gv_format_type__(png, binary, media(image/png,[])).
+gv_format_type__(pov, binary).
+gv_format_type__(ps, binary, media(application/postscript,[])).
+% PostScript output with PDF notations.
+gv_format_type__(ps2, binary).
+gv_format_type__(psd, binary, media(image/'vnd.adobe.photoshop',[])).
+gv_format_type__(sgi, binary, media(image/sgi,[])).
+gv_format_type__(svg, text, media(image/'svg+xml',[])).
+gv_format_type__(svgz, binary, media(application/gzip,[])).
+gv_format_type__(tga, binary, media(image/'x-targa',[])).
+gv_format_synonym__(tif, tiff).
+gv_format_type__(tiff, binary, media(image,tiff,[])).
+gv_format_type__(tk, text).
+gv_format_type__(vdx, text).
+gv_format_type__(vml, text, media(application,'vnd.openxmlformats-officedocument.vmlDrawing',[])).
+gv_format_type__(vmlz, binary).
+gv_format_type__(vrml, text, media(model/vrml,[])).
+gv_format_type__(wbmp, binary, media(image,'vnd.wap.wbmp',[])).
+gv_format_type__(webp, binary, media(image/webp,[])).
+gv_format_type__(x11, viewer).
+gv_format_type__(xdot, text, media(text/'vnd.graphviz',[])).
+gv_format_type__(xdot_json, text, media(application/json,[])).
+gv_format_type__('xdot1.2', text, media(text/'vnd.graphviz',[])).
+gv_format_type__('xdot1.4', text, media(text/'vnd.graphviz',[])).
+gv_format_type__(xlib, viewer).
 
 
 

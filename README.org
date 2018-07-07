@@ -228,7 +228,7 @@ specified with the ~format(+atom)~ option in ~export_graph/[2,3]~ and
 | ~cmap~      | text   |                                                            | Client-side image map files.  Not well-formed XML.                                                                                    |
 | ~cmapx~     | text   |                                                            | Server-side and client-side image map files.  Well-formed XML.                                                                        |
 | ~cmapx_np~  | text   |                                                            | Like ~cmapx~, but only using rectangles as active areas.                                                                              |
-| ~dot~       | text   | ~test/vnd.graphviz~                                        | Reproduces the DOT input, along with layout information.                                                                              |
+| ~dot~       | text   | ~text/vnd.graphviz~                                        | Reproduces the DOT input, along with layout information.                                                                              |
 | ~dot_json~  | text   | ~application/json~                                         | JSON representation of the content (i.e., non-layout) information of the ~dot~ format.                                                |
 | ~eps~       | binary | ~image/eps~                                                | Encapsulated PostScript (EPS)                                                                                                         |
 | ~exr~       | binary |                                                            | OpenEXR: a high dynamic-range (HDR) image file format developed by Industrial Light & Magic for use in computer imaging applications. |
@@ -273,11 +273,11 @@ specified with the ~format(+atom)~ option in ~export_graph/[2,3]~ and
 | ~wbmp~      | binary | ~image/vnd.wap.wbmp~                                       | Wireless Application Protocol Bitmap Format (WBMP)                                                                                    |
 | ~webp~      | binary | ~image/webp~                                               | Google image format for the web (WebP)                                                                                                |
 | ~x11~       | viewer |                                                            | X11-based viewer                                                                                                                      |
-| ~xdot~      | text   |                                                            | Like ~dot~, but adding more detailed information about how graph components are drawn.                                                |
+| ~xdot~      | text   | ~text/vnd.graphviz~                                        | Like ~dot~, but adding more detailed information about how graph components are drawn.                                                |
 | ~xdot_json~ | text   | ~application/json~                                         | JSON representation of the content (i.e., non-layout) information of the ~xdot~ format.                                               |
-| ~xdot1.2~   | text   |                                                            | Same as setting ~xdotversion=1.2~ with the ~xdot~ format.                                                                             |
-| ~xdot1.4~   | text   |                                                            | Same as setting ~xdotversion=1.4~ with the ~xdot~ format.                                                                             |
-| ~xlib~      | viewer |                                                            | X11-based viewer                                                                                                                      |
+| ~xdot1.2~   | text   | ~text/vnd.graphviz~                                        | Same as setting ~xdotversion=1.2~ with the ~xdot~ format.                                                                             |
+| ~xdot1.4~   | text   | ~text/vnd.graphviz~                                        | Same as setting ~xdotversion=1.4~ with the ~xdot~ format.                                                                             |
+| ~xlib~      | viewer |                                                            | Same as ~x11~.                                                                                                                        |
 
 * HTML-like labels
 

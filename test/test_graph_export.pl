@@ -1,10 +1,11 @@
 :- begin_tests(graph_export).
 
 :- use_module(library(apply)).
-:- use_module(library(graph/graph_export)).
 :- use_module(library(plunit)).
 :- use_module(library(process)).
 :- use_module(library(yall)).
+
+:- use_module(library(graph/graph_export)).
 
 :- meta_predicate
     test_export_graph(+, 1),
@@ -66,17 +67,17 @@ test(proof_tree, [cleanup(delete_file(File))]) :-
   ).
 
 export_proof_(Out, Tree) :-
-  Tree = t(Rule,Concl,Prems),
+  Tree = t(Rule,Concl,SubTrees),
   dot_node(Out, Concl),
   dot_node(Out, Tree, [color(green),label(Rule)]),
   dot_arc(Out, Concl, Tree),
-  maplist(export_subproof_(Out, Tree), Prems).
+  maplist(export_subproof_(Out, Tree), SubTrees).
 
-export_subproof_(Out, Node, Tree) :-
-  Tree = t(_Rule,Concl,_Prems),
-  dot_node(Out, Concl),
-  dot_arc(Out, Node, Concl),
-  export_proof_(Out, Tree).
+export_subproof_(Out, Tree, SubTree) :-
+  SubTree = t(_,Prem,_),
+  dot_node(Out, Prem),
+  dot_arc(Out, Tree, Prem),
+  export_proof_(Out, SubTree).
 
 
 

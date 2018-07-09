@@ -197,7 +197,7 @@ the top-level can be enabled with ~debug(dot)~, and disabled by
 This section gives a full enumeration of the values that are supported
 by this library's options.
 
-** Layout methods (~method/1~)
+** Layout methods (option ~method/1~)
 
 The followig GraphViz layout methods are supported.  They can be
 specified with the ~method(+atom)~ option in ~export_graph/[2,3]~ and
@@ -214,7 +214,7 @@ specified with the ~method(+atom)~ option in ~export_graph/[2,3]~ and
 | ~sfdp~      | Large undirected graphs. |
 | ~twopi~     | Radial graph layouts.    |
 
-** Output formats (~format/1~)
+** Output formats (option ~format/1~)
 
 The following GraphViz output formats are supported.  They can be
 specified with the ~format(+atom)~ option in ~export_graph/[2,3]~ and

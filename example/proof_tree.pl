@@ -9,17 +9,17 @@ run :-
   ).
 
 view_proof(Proof) :-
-  view_graph({Proof}/[Out]>>export_proof(Out, Proof), [directed(true)]).
+  view_graph({Proof}/[Out]>>export_proof_(Out, Proof), [directed(true)]).
 
-export_proof(Out, Tree) :-
-  Tree = t(Rule,Concl,Prems),
+export_proof_(Out, Tree) :-
+  Tree = t(Rule,Concl,SubTrees),
   dot_node(Out, Concl),
   dot_node(Out, Tree, [label(Rule)]),
   dot_arc(Out, Concl, Tree),
-  maplist(export_subproof(Out, Tree), Prems).
+  maplist(export_subproof_(Out, Tree), SubTrees).
 
-export_subproof(Out, Node, Tree) :-
-  Tree = t(_Rule,Concl,_Prems),
-  dot_node(Out, Concl),
-  dot_arc(Out, Node, Concl),
-  export_proof(Out, Tree).
+export_subproof_(Out, Tree, SubTree) :-
+  SubTree = t(_,Prem,_),
+  dot_node(Out, Prem),
+  dot_arc(Out, Tree, Prem),
+  export_proof_(Out, SubTree).

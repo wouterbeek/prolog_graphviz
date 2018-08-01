@@ -6,6 +6,7 @@
 :- use_module(library(yall)).
 
 :- use_module(library(graph/gv)).
+:- use_module(library(os_ext)).
 
 :- meta_predicate
     test_gv_export(+, 1),
@@ -82,13 +83,6 @@ export_subproof_(Out, Tree, SubTree) :-
 
 % HELPERS %
 
-%! open_pdf(+File:atom) is det.
-
-open_pdf(File) :-
-  process_create(path(evince), [file(File)], []).
-
-
-
 %! test_gv_export(+File:atom, :Goal_1) is det.
 %! test_gv_export(+File:atom, :Goal_1, +Options:list(compound)) is det.
 
@@ -98,6 +92,6 @@ test_gv_export(File, Goal_1) :-
 
 test_gv_export(File, Goal_1, Options) :-
   gv_export(File, Goal_1, Options),
-  open_pdf(File).
+  open_file(File).
 
 :- end_tests(gv).

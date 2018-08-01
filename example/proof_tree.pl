@@ -1,5 +1,5 @@
 :- use_module(library(apply)).
-:- use_module(library(graph/graph_export)).
+:- use_module(library(graph/gv)).
 :- use_module(library(yall)).
 
 run :-
@@ -9,7 +9,7 @@ run :-
   ).
 
 view_proof(Proof) :-
-  view_graph({Proof}/[Out]>>export_proof_(Out, Proof), [directed(true)]).
+  gv_view({Proof}/[Out]>>export_proof_(Out, Proof), [directed(true)]).
 
 export_proof_(Out, Tree) :-
   Tree = t(Rule,Concl,SubTrees),

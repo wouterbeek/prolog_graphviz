@@ -25,7 +25,7 @@ Once installed, this library can by imported with the following
 command:
 
 #+BEGIN_SRC prolog
-?- [library(graph/graph_export)].
+?- [library(graph/gv)].
 #+END_SRC
 
 ** Exporting a single node
@@ -37,7 +37,7 @@ graph consisting of one node, and open the result in a GraphViz
 viewer:
 
 #+BEGIN_SRC prolog
-?- view_graph([Out]>>format(Out, "x [label=<Hello,<BR/>world!>,shape=diamond];\n", [])).
+?- gv_view([Out]>>format(Out, "x [label=<Hello,<BR/>world!>,shape=diamond];\n", [])).
 #+END_SRC
 
 This opens the following image inside a GraphViz-compatible viewer:
@@ -49,7 +49,7 @@ This opens the following image inside a GraphViz-compatible viewer:
 In this example we write a graph that consists of a single edge:
 
 #+BEGIN_SRC prolog
-?- export_graph('loves.svg', [Out]>>format(Out, "John -- Mary [label=loves]", [])).
+?- gv_export('loves.svg', [Out]>>format(Out, "John -- Mary [label=loves]", [])).
 #+END_SRC
 
 This writes the following image to an SVG file.  See the table in
@@ -91,11 +91,11 @@ does not accidentally change the exported graph.
 
 #+BEGIN_SRC prolog
 :- use_module(library(apply)).
-:- use_module(library(graph/graph_export)).
+:- use_module(library(graph/gv)).
 :- use_module(library(yall)).
 
 view_proof(Proof) :-
-  view_graph({Proof}/[Out]>>export_proof(Out, Proof), [directed(true)]).
+  gv_view({Proof}/[Out]>>export_proof(Out, Proof), [directed(true)]).
 
 export_proof(Out, Tree) :-
   Tree = t(Rule,Concl,Prems),
@@ -138,11 +138,11 @@ The following code exports such parse trees to SVG (see
 
 #+BEGIN_SRC prolog
 :- use_module(library(apply)).
-:- use_module(library(graph/graph_export)).
+:- use_module(library(graph/gv)).
 :- use_module(library(yall)).
 
 export_tree(Tree) :-
-  export_graph('parse_tree.svg', {Tree}/[Out]>>export_tree(Out, Tree, _)).
+  gv_export('parse_tree.svg', {Tree}/[Out]>>export_tree(Out, Tree, _)).
 
 export_tree(Out, Tree, Id) :-
   Tree =.. [Op|Trees],
@@ -175,10 +175,10 @@ distinguished.
 * Directed arcs or undirected edges?
 
 Both directed and undirected graphs can be exported.  By default,
-~export_graph/[2,3]~ and ~view_graph/[1,2]~ export undirected graphs.
+~gv_export/[2,3]~ and ~gv_view/[1,2]~ export undirected graphs.
 Directed graphs are exported by setting the ~directed(true)~ option in
-~export_graph/3~ or ~view_graph/2~.  For undirected graphs, undirected
-edges are emitted with ~dot_edge/[3,4]~ and ~dot_edge_id/[3,4]~.  For
+~gv_export/3~ or ~gv_view/2~.  For undirected graphs, undirected edges
+are emitted with ~dot_edge/[3,4]~ and ~dot_edge_id/[3,4]~.  For
 directed graph, directed edges or arcs are emitted with
 ~dot_arc/[3,4]~ and ~dot_arc_id/[3,4]~.
 
@@ -200,8 +200,8 @@ by this library's options.
 ** Layout methods (option ~method/1~)
 
 The followig GraphViz layout methods are supported.  They can be
-specified with the ~method(+atom)~ option in ~export_graph/[2,3]~ and
-~view_graph/[1,2]~.
+specified with the ~method(+atom)~ option in ~gv_export/[2,3]~ and
+~gv_view/[1,2]~.
 
 | *Method*    | *Use case*               |
 |-------------+--------------------------|
@@ -217,8 +217,8 @@ specified with the ~method(+atom)~ option in ~export_graph/[2,3]~ and
 ** Output formats (option ~format/1~)
 
 The following GraphViz output formats are supported.  They can be
-specified with the ~format(+atom)~ option in ~export_graph/[2,3]~ and
-~view_graph/[1,2]~.
+specified with the ~format(+atom)~ option in ~gv_export/[2,3]~ and
+~gv_view/[1,2]~.
 
 | *Extension* | *Type* | *Media Type*                                               | *Description*                                                                                                                         |
 |-------------+--------+------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------|

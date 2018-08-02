@@ -115,7 +115,7 @@ dot_attribute(label, Value, Attr) :- !,
   dot_attribute(label, [Value], Attr).
 % other attributes
 dot_attribute(Name, Value, Attr) :-
-  format(string(Attr), "~a=\"~s\"", [Name,Value]).
+  format(string(Attr), "~a=\"~w\"", [Name,Value]).
 
 
 

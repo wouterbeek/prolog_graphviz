@@ -27,6 +27,7 @@
 :- use_module(library(settings)).
 
 :- use_module(library(call_ext)).
+:- use_module(library(file_ext)).
 
 :- discontiguous
     gv_format_synonym__/2,

@@ -36,10 +36,11 @@
 :- meta_predicate
     gv_export(+, 1),
     gv_export(+, 1, +),
+    gv_export_stream(1, +, +, +, +),
     gv_view(1),
     gv_view(1, +).
 
-:- setting(default_gv_export_format, atom, svg,
+:- setting(default_gv_format_option, atom, svg,
            "The default format that is used when exporting a graph using GraphViz.").
 :- setting(default_gv_method, atom, dot,
            "The default method that is used when creating a GraphViz visualization.").
@@ -97,50 +98,47 @@ gv_export(File, Goal_1) :-
 
 
 gv_export(File, Goal_1, Options) :-
-  gv_export_format_option(File, Format, Type, Options),
+  gv_format_option(File, Format, Options),
+  gv_format_type(Format, Type),
+  write_to_file(File, gv_export_stream(Goal_1, Format, Type, Options), [type(Type)]).
+
+gv_export_stream(Goal_1, Format, Type, Options, Out) :-
   gv_method_option(Method, Options),
   setup_call_cleanup(
-    open(File, write, Out, [type(Type)]),
-    setup_call_cleanup(
-      (
-        % Open a GraphViz input and a GraphViz output stream.  The
-        % input stream expects statments in the DOT language.  The
-        % output stream is in the specified Format.
-        process_create(
-          path(Method),
-          ['-T',Format],
-          [stdin(pipe(ProcIn)),stdout(pipe(ProcOut))]
-        ),
-        % Binary and text streams are treated differently.
-        set_stream(ProcOut, type(Type))
+    (
+      % Open a GraphViz input and a GraphViz output stream.  The input
+      % stream expects statments in the DOT language.  The output
+      % stream is in the specified Format.
+      process_create(
+        path(Method),
+        ['-T',Format],
+        [stdin(pipe(ProcIn)),stdout(pipe(ProcOut))]
       ),
-      (
-        call_cleanup(
-          dot_graph(ProcIn, Goal_1, Options),
-          close(ProcIn)
-        ),
-        copy_stream_data(ProcOut, Out)
-      ),
-      close(ProcOut)
+      % Binary and text streams are treated differently.
+      set_stream(ProcOut, type(Type))
     ),
-    close(Out)
+    (
+      call_cleanup(
+        dot_graph(ProcIn, Goal_1, Options),
+        close(ProcIn)
+      ),
+      copy_stream_data(ProcOut, Out)
+    ),
+    close(ProcOut)
   ).
 
-%! gv_export_format_option(+File:atom, -Format:atom, -Type:oneof([binary,text]), +Options:list(compound)) is det.
 
-gv_export_format_option(File, Format, Type, Options) :-
-  gv_export_format(File, Format, Options),
-  (   gv_format_type(Format, Type)
-  ->  memberchk(Type, [binary,text])
-  ;   type_error(gv_export_format, Format)
-  ).
+%! gv_format_option(+File:atom, -Format:atom, +Options:list(compound)) is det.
 
-gv_export_format(_, Format, Options) :-
+gv_format_option(_, Format, Options) :-
   option(format(Format), Options), !.
-gv_export_format(File, Format, _) :-
+gv_format_option(File, Format, _) :-
   file_name_extension(_, Format, File), !.
-gv_export_format(_, Format, _) :-
-  setting(default_gv_export_format, Format).
+gv_format_option(_, Format, _) :-
+  setting(default_gv_format_option, Format).
+
+
+%! gv_method_option(-Method:atom, +Options:list(compound)) is det.
 
 gv_method_option(Method, Options) :-
   (   option(method(Method), Options)

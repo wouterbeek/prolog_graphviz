@@ -22,11 +22,11 @@
 */
 
 :- use_module(library(error)).
-:- use_module(library(option)).
 :- use_module(library(process)).
 :- use_module(library(settings)).
 
 :- use_module(library(call_ext)).
+:- use_module(library(dict)).
 :- use_module(library(file_ext)).
 
 :- discontiguous
@@ -37,11 +37,11 @@
 :- meta_predicate
     gv_export(+, 1),
     gv_export(+, 1, +),
-    gv_export_stream(1, +, +, +, +),
+    gv_export_stream_(1, +, +, +, +),
     gv_view(1),
     gv_view(1, +).
 
-:- setting(default_gv_format_option, atom, svg,
+:- setting(default_gv_export_format, atom, svg,
            "The default format that is used when exporting a graph using GraphViz.").
 :- setting(default_gv_method, atom, dot,
            "The default method that is used when creating a GraphViz visualization.").
@@ -55,7 +55,7 @@
 % EXPORT/VIEW %
 
 %! gv_export(+File:atom, :Goal_1) is det.
-%! gv_export(+File:atom, :Goal_1, +Options:list(compound)) is det.
+%! gv_export(+File:atom, :Goal_1, +Options:dict) is det.
 %
 % @arg File is the name of the file to which the graph export is
 %      written.
@@ -63,48 +63,64 @@
 % @arg Goal_1 is a unary goal that takes a Prolog output stream that
 %      receives DOT formatted messages.
 %
-% @arg Options is a list that may include any of the following
+% @arg Options is a dictionary that may include any of the following
 %      options:
 %
-%      * directed(+boolean)
+%   * format(+atom)
 %
-%        Whether the graph is directed (`true`) or undirected
-%        (`false`, default).
+%     The format that is used to store the output in.  Both binary and
+%     text output formats are supported.  See `gv_format_type(-Format,
+%     Type), memberchk(Type, [binary,text])` for possible values.  The
+%     default value is based on the file extension of File, if this
+%     can be heuristically mapped to a GraphViz format, or else uses
+%     the value of setting `default_gv_export_format`.
 %
-%      * format(+atom)
+%   * method(+atom)
 %
-%        The format that is used to store the output in.  Both binary
-%        and text output formats are supported.  See
-%        `gv_format_type(-Format, Type), memberchk(Type,
-%        [binary,text])` for possible values.  The default value is
-%        stored in setting `default_export_format`.
+%     The method that is used by GraphViz to calculate the graph
+%     layout.  See `gv_method(-Method)` for possible values.  The
+%     default value is stored in setting `default_gv_method`.
 %
-%      * method(+atom)
-%
-%        The method that is used by GraphViz to calculate the graph
-%        layout.  See `gv_method(-Method)` for possible values.  The
-%        default value is stored in setting `default_method`.
-%
-%      * name(+atom)
-%
-%        The name of the graph.  Default is `noname`.
-%
-%      * overlap(+boolean)
-%
-%        Whether or not nodes are allowed to overlap.  Default is
-%        `false`.
+%   * Other options are passed to dot_graph/4.
 
 gv_export(File, Goal_1) :-
-  gv_export(File, Goal_1, []).
+  gv_export(File, Goal_1, options{}).
 
 
-gv_export(File, Goal_1, Options) :-
-  gv_format_option(File, Format, Options),
-  gv_format_type(Format, Type),
-  write_to_file(File, gv_export_stream(Goal_1, Format, Type, Options), [type(Type)]).
+gv_export(File, Goal_1, Options0) :-
+  gv_export_default_format_(File, DefaultFormat),
+  gv_options_(Options0, DefaultFormat, Format, Type, Method, Options),
+  must_be(oneof([binary,text]), Type),
+  write_to_file(
+    File,
+    gv_export_stream_(Goal_1, Format, Type, Method, Options),
+    [type(Type)]
+  ).
 
-gv_export_stream(Goal_1, Format, Type, Options, Out) :-
-  gv_method_option(Method, Options),
+gv_export_default_format_(File, DefaultFormat) :-
+  file_extension(File, DefaultFormat),
+  gv_format(DefaultFormat), !.
+gv_export_default_format_(_, DefaultFormat) :-
+  setting(default_gv_export_format, DefaultFormat).
+
+%! gv_options_(+Options0:dict, +DefaultFormat:gv_format, -Format:gv_format, -Type:gv_type, -Method:gv_method, -Options:dict) is det.
+
+gv_options_(Options0, DefaultFormat, Format, Type, Method, Options2) :-
+  % Set default option values.
+  setting(default_gv_method, DefaultMethod),
+  merge_dicts(
+    Options0,
+    options{format: DefaultFormat, method: DefaultMethod},
+    Options1
+  ),
+  % Obtain values for all options.
+  dict_select(_{format: Format, method: Method}, Options1, Options2),
+  % Typecheck all option values.
+  call_must_be(gv_format, Format),
+  call_must_be(gv_method, Method),
+  gv_format_type(Format, Type).
+
+gv_export_stream_(Goal_1, Format, Type, Method, Options, Out) :-
   setup_call_cleanup(
     (
       % Open a GraphViz input and a GraphViz output stream.  The input
@@ -129,29 +145,9 @@ gv_export_stream(Goal_1, Format, Type, Options, Out) :-
   ).
 
 
-%! gv_format_option(+File:atom, -Format:atom, +Options:list(compound)) is det.
-
-gv_format_option(_, Format, Options) :-
-  option(format(Format), Options), !.
-gv_format_option(File, Format, _) :-
-  file_name_extension(_, Format, File), !.
-gv_format_option(_, Format, _) :-
-  setting(default_gv_format_option, Format).
-
-
-%! gv_method_option(-Method:atom, +Options:list(compound)) is det.
-
-gv_method_option(Method, Options) :-
-  (   option(method(Method), Options)
-  ->  true
-  ;   setting(default_gv_method, Method)
-  ),
-  call_must_be(gv_method, Method).
-
-
 
 %! gv_view(:Goal_1) is det.
-%! gv_view(:Goal_1, +Options:list(compound)) is det.
+%! gv_view(:Goal_1, +Options:dict) is det.
 %
 % Generate a GraphViz graph visualization and open the result in a
 % viewer application.
@@ -159,31 +155,23 @@ gv_method_option(Method, Options) :-
 % @arg Goal_1 is a unary goal that takes a Prolog output stream that
 %      receives DOT formatted messages.
 %
-% @arg Options is a list that may include any of the options defined
-%      for gv_export/3.
+% @arg Options is a dictionary that may include any of the options
+%      defined for gv_export/3, but option `format' is set to the
+%      value of setting `default_gv_view_format'.
 
 gv_view(Goal_1) :-
-  gv_view(Goal_1, []).
+  gv_view(Goal_1, options{}).
 
 
-gv_view(Goal_1, Options) :-
-  gv_view_format_option(Format, Options),
-  gv_method_option(Method, Options),
+gv_view(Goal_1, Options0) :-
+  setting(default_gv_view_format, DefaultFormat),
+  gv_options_(Options0, DefaultFormat, Format, Type, Method, Options),
+  must_be(oneof([viewer]), Type),
   setup_call_cleanup(
     process_create(path(Method), ['-T',Format], [stdin(pipe(ProcIn))]),
     dot_graph(ProcIn, Goal_1, Options),
     close(ProcIn)
   ).
-
-gv_view_format_option(Format, Options) :-
-  (   option(format(Format), Options)
-  ->  true
-  ;   setting(default_gv_view_format, Format)
-  ),
-  call_must_be(gv_view_format, Format).
-
-gv_view_format(Format) :-
-  gv_format_type(Format, viewer).
 
 
 
@@ -219,10 +207,10 @@ gv_format_media_type(Format2, MediaType) :-
 
 
 
-%! gv_format_type(+Format:atom, +Type:oneof([binary,text,viewer])) is semidet.
-%! gv_format_type(+Format:atom, -Type:oneof([binary,text,viewer])) is det.
-%! gv_format_type(-Format:atom, +Type:oneof([binary,text,viewer])) is multi.
-%! gv_format_type(-Format:atom, -Type:oneof([binary,text,viewer])) is nondet.
+%! gv_format_type(+Format:atom, +Type:gv_type) is semidet.
+%! gv_format_type(+Format:atom, -Type:gv_type) is det.
+%! gv_format_type(-Format:atom, +Type:gv_type) is multi.
+%! gv_format_type(-Format:atom, -Type:gv_type) is nondet.
 
 gv_format_type(Format1, Type) :-
   gv_format_synonym_(Format1, Format2),

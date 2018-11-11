@@ -30,11 +30,11 @@
 
 :- use_module(library(apply)).
 :- use_module(library(error)).
-:- use_module(library(option)).
 :- use_module(library(uuid)).
 :- use_module(library(yall)).
 
 :- use_module(library(dcg)).
+:- use_module(library(dict)).
 :- use_module(library(debug_ext)).
 :- use_module(library(file_ext)).
 :- use_module(library(hash_ext)).
@@ -48,7 +48,7 @@
 
 
 %! dot_arc(+Out:stream, +FromTerm:term, +ToTerm:term) is det.
-%! dot_arc(+Out:stream, +FromTerm:term, +ToTerm:term, +Options:list(compound)) is det.
+%! dot_arc(+Out:stream, +FromTerm:term, +ToTerm:term, +Options:dict) is det.
 %
 % Emits an arc (directed edge) from one Prolog term to another in the
 % DOT language.
@@ -64,7 +64,7 @@
 %      combination with dot_id/2 -- instead.
 
 dot_arc(Out, FromTerm, ToTerm) :-
-  dot_arc(Out, FromTerm, ToTerm, []).
+  dot_arc(Out, FromTerm, ToTerm, options{}).
 
 
 dot_arc(Out, FromTerm, ToTerm, Options) :-
@@ -74,7 +74,7 @@ dot_arc(Out, FromTerm, ToTerm, Options) :-
 
 
 %! dot_arc_id(+Out:stream, +FromId:atom, +ToId:atom) is det.
-%! dot_arc_id(+Out:stream, +FromId:atom, +ToId:atom, +Options:list(compound)) is det.
+%! dot_arc_id(+Out:stream, +FromId:atom, +ToId:atom, +Options:dict) is det.
 %
 % Emits a directed edge or arc from one DOT ID to another in the DOT
 % language.
@@ -82,7 +82,7 @@ dot_arc(Out, FromTerm, ToTerm, Options) :-
 % @see dot_arc/[3,4] allows arcs to be asserted between Prolog terms.
 
 dot_arc_id(Out, FromId, ToId) :-
-  dot_arc_id(Out, FromId, ToId, []).
+  dot_arc_id(Out, FromId, ToId, options{}).
 
 
 dot_arc_id(Out, FromId, ToId, Options) :-
@@ -91,26 +91,26 @@ dot_arc_id(Out, FromId, ToId, Options) :-
 
 
 
-%! dot_attributes(+Options:list(compound), -String:string) is det.
+%! dot_attributes(+Options:dict, -String:string) is det.
 
-dot_attributes([], "") :- !.
+dot_attributes(options{}, "") :- !.
 dot_attributes(Options, String) :-
-  maplist(dot_attribute, Options, Strings),
+  dict_pairs(Options, Pairs),
+  maplist(dot_attribute, Pairs, Strings),
   atomics_to_string(Strings, ",", String0),
   format(string(String), " [~s]", [String0]).
 
-dot_attribute(Option, String) :-
-  Option =.. [Name,Value],
+dot_attribute(Name-Value, String) :-
   dot_attribute(Name, Value, String).
 
-% Multi-line label
+% multi-line label
 dot_attribute(label, Values, Attr) :-
   is_list(Values), !,
   maplist([Value,Line]>>format(string(Line), "~w", [Value]), Values, Lines),
   atomics_to_string(Lines, "<BR/>", Unescaped),
   dot_html_replace(Unescaped, Escaped),
   format(string(Attr), "label=<~s>", [Escaped]).
-% Single-line label
+% single-line label
 dot_attribute(label, Value, Attr) :- !,
   dot_attribute(label, [Value], Attr).
 % other attributes
@@ -120,7 +120,7 @@ dot_attribute(Name, Value, Attr) :-
 
 
 %! dot_edge(+Out:stream, +FromTerm:term, +ToTerm:term) is det.
-%! dot_edge(+Out:stream, +FromTerm:term, +ToTerm:term, +Options:list(compound)) is det.
+%! dot_edge(+Out:stream, +FromTerm:term, +ToTerm:term, +Options:dict) is det.
 %
 % Emits an edge between two Prolog terms in the DOT language.
 %
@@ -136,7 +136,7 @@ dot_attribute(Name, Value, Attr) :-
 %      -- in combination with dot_id/2 -- instead.
 
 dot_edge(Out, FromTerm, ToTerm) :-
-  dot_edge(Out, FromTerm, ToTerm, []).
+  dot_edge(Out, FromTerm, ToTerm, options{}).
 
 
 dot_edge(Out, FromTerm, ToTerm, Options) :-
@@ -146,14 +146,14 @@ dot_edge(Out, FromTerm, ToTerm, Options) :-
 
 
 %! dot_edge_id(+Out:stream, +FromId:atom, +ToId:atom) is det.
-%! dot_edge_id(+Out:stream, +FromId:atom, +ToId:atom, +Options:list(compound)) is det.
+%! dot_edge_id(+Out:stream, +FromId:atom, +ToId:atom, +Options:dict) is det.
 %
 % Emits an edge between two DOT IDs in the DOT language.
 %
 % @see dot_edge/[3,4] allows edges to be asserted between Prolog terms.
 
 dot_edge_id(Out, FromId, ToId) :-
-  dot_edge_id(Out, FromId, ToId, []).
+  dot_edge_id(Out, FromId, ToId, options{}).
 
 
 dot_edge_id(Out, FromId, ToId, Options) :-
@@ -163,48 +163,70 @@ dot_edge_id(Out, FromId, ToId, Options) :-
 
 
 %! dot_graph(+Out:stream, :Goal_1) is det.
-%! dot_graph(+Out:stream, :Goal_1, +Options:list(compound)) is det.
+%! dot_graph(+Out:stream, :Goal_1, +Options:dict) is det.
 %
-% The following options are supported:
+% @arg Options The following options are supported:
 %
 %   * directed(+boolean)
 %
 %     Whether the graph is directed (`true`) or undirected (`false`,
 %     default).
 %
-%   * name(+atom)
+%   * name(+string)
 %
-%   The name of the graph.  Default is `noname`.
+%     The name of the graph.  Default is `"noname"`.
+%
+%   * overlap(+boolean)
+%
+%     Whether or not nodes are allowed to overlap.  Default is
+%    `false`.
 %
 %   * strict(+boolean)
 %
-%   Value `true' indicates that the graph is strict, i.e., has no
-%   self-arcs and has not multi-edges.  Default is `false'.
+%     Value `true' indicates that the graph is strict, i.e., has no
+%     self-arcs and has not multi-edges.  Default is `false'.
 %
-%   This can only be used in combination with option `directed(true)',
-%   and throws an exception otherwise.
+%     This can only be used in combination with option
+%     `directed(true)', and throws an exception otherwise.
 
 dot_graph(Out, Goal_1) :-
-  dot_graph(Out, Goal_1, []).
+  dot_graph(Out, Goal_1, options{}).
 
 
-dot_graph(Out, Goal_1, Options1) :-
-  select_option(directed(Directed), Options1, Options2, false),
+dot_graph(Out, Goal_1, Options0) :-
+  % Set default option values.
+  merge_dicts(
+    Options0,
+    options{directed: false, name: "noname", overlap: false, strict: false},
+    Options1
+  ),
+  % Obtain values for all options.
+  dict_select(
+    _{directed: Directed, name: Name, overlap: Overlap, strict: Strict},
+    Options1,
+    Options2
+  ),
+  % Typecheck all option values.
   must_be(boolean, Directed),
-  select_option(strict(Strict), Options2, Options3, false),
+  must_be(string, Name),
+  must_be(boolean, Overlap),
   must_be(boolean, Strict),
+  % Check for forbidden combinations of option values.
   (   Directed == false,
       Strict == true
-  ->  throw(error(option_combination(directed(Directed),strict(Strict)),dot_graph/3))
+  ->  throw(
+        error(
+          option_combination(directed(Directed),strict(Strict)),
+          dot_graph/3
+        )
+      )
   ;   true
   ),
   dot_graph_type(Directed, Type),
-  select_option(name(Name), Options3, Options4, noname),
-  must_be(atom, Name),
-  format_debug(dot, Out, "~a ~a {", [Type,Name]),
-  merge_options([charset('UTF-8'),colorscheme(svg)], Options4, Options5),
-  dot_attributes(Options5, String),
-  format_debug(dot, Out, "  graph~s;", [String]),
+  format_debug(dot, Out, "~a ~s {", [Type,Name]),
+  merge_dicts(Options2, options{charset: 'UTF-8', colorscheme: svg}, Options3),
+  dot_attributes(Options3, GraphAttrsString),
+  format_debug(dot, Out, "  graph~s;", [GraphAttrsString]),
   call(Goal_1, Out),
   format_debug(dot, Out, "}").
 
@@ -256,7 +278,7 @@ dot_id(Term, Id) :-
 
 
 %! dot_node(+Out:stream, +Term:term) is det.
-%! dot_node(+Out:stream, +Term:term, +Options:list(compound)) is det.
+%! dot_node(+Out:stream, +Term:term, +Options:dict) is det.
 %
 % @arg Out is a handle to an output stream.
 %
@@ -285,7 +307,7 @@ dot_id(Term, Id) :-
 %      in combination with dot_id/2 -- instead.
 
 dot_node(Out, Term) :-
-  dot_node(Out, Term, [label(Term)]).
+  dot_node(Out, Term, options{label: Term}).
 
 
 dot_node(Out, Term, Options) :-
@@ -295,12 +317,12 @@ dot_node(Out, Term, Options) :-
 
 
 %! dot_node_id(+Out:stream, +Id:atom) is det.
-%! dot_node_id(+Out:stream, +Id:atom, +Options:list(compound)) is det.
+%! dot_node_id(+Out:stream, +Id:atom, +Options:dict) is det.
 %
 % @see dot_node/[2,3] allows nodes to be asserted for Prolog terms.
 
 dot_node_id(Out, Id) :-
-  dot_node_id(Out, Id, []).
+  dot_node_id(Out, Id, options{}).
 
 
 dot_node_id(Out, Id, Options) :-

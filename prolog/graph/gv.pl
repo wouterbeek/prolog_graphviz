@@ -37,7 +37,7 @@
 :- meta_predicate
     gv_export(+, 1),
     gv_export(+, 1, +),
-    gv_export_stream_(1, +, +, +, +),
+    gv_export_stream_(1, +, +, +, +, +),
     gv_view(1),
     gv_view(1, +).
 

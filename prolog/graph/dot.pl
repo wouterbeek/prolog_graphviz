@@ -1,23 +1,31 @@
 :- module(
   dot,
   [
-    dot_arc/3,          % +Out, +FromTerm, +ToTerm
-    dot_arc/4,          % +Out, +FromTerm, +ToTerm. +Options
-    dot_arc_id/3,       % +Out, +FromId, +ToId
-    dot_arc_id/4,       % +Out, +FromId, +ToId. +Options
-    dot_edge/3,         % +Out, +FromTerm, +ToTerm
-    dot_edge/4,         % +Out, +FromTerm, +ToTerm. +Options
-    dot_edge_id/3,      % +Out, +FromId, +ToId
-    dot_edge_id/4,      % +Out, +FromId, +ToId. +Options
-    dot_graph/2,        % +Out, :Goal_1
-    dot_graph/3,        % +Out, :Goal_1, +Options
-    dot_html_replace/2, % +Unescaped, -Escaped
-    dot_id/1,           % -Id
-    dot_id/2,           % +Term, -Id
-    dot_node/2,         % +Out, +Term
-    dot_node/3,         % +Out, +Term, +Options
-    dot_node_id/2,      % +Out, +Id
-    dot_node_id/3       % +Out, +Id, +Options
+    dot_arc/3,            % +Out, +FromTerm, +ToTerm
+    dot_arc/4,            % +Out, +FromTerm, +ToTerm. +Options
+    dot_arc_id/3,         % +Out, +FromId, +ToId
+    dot_arc_id/4,         % +Out, +FromId, +ToId. +Options
+    dot_cluster/3,        % +Out, +Term, :Goal_1
+    dot_cluster/4,        % +Out, +Term, :Goal_1, +Options
+    dot_cluster_arc/3,    % +Out, +FromTerm, +ToTerm
+    dot_cluster_arc/4,    % +Out, +FromTerm, +ToTerm, +Options
+    dot_cluster_arc_id/3, % +Out, +FromTerm, +ToTerm
+    dot_cluster_arc_id/4, % +Out, +FromTerm, +ToTerm, +Options
+    dot_cluster_id/3,     % +Out, +Id, :Goal_1
+    dot_cluster_id/4,     % +Out, +Id, :Goal_1, +Options
+    dot_edge/3,           % +Out, +FromTerm, +ToTerm
+    dot_edge/4,           % +Out, +FromTerm, +ToTerm. +Options
+    dot_edge_id/3,        % +Out, +FromId, +ToId
+    dot_edge_id/4,        % +Out, +FromId, +ToId. +Options
+    dot_graph/2,          % +Out, :Goal_1
+    dot_graph/3,          % +Out, :Goal_1, +Options
+    dot_html_replace/2,   % +Unescaped, -Escaped
+    dot_id/1,             % -Id
+    dot_id/2,             % +Term, -Id
+    dot_node/2,           % +Out, +Term
+    dot_node/3,           % +Out, +Term, +Options
+    dot_node_id/2,        % +Out, +Id
+    dot_node_id/3         % +Out, +Id, +Options
   ]
 ).
 
@@ -43,7 +51,11 @@
 
 :- meta_predicate
     dot_graph(+, 1),
-    dot_graph(+, 1, +).
+    dot_graph(+, 1, +),
+    dot_cluster(+, +, 1),
+    dot_cluster(+, +, 1, +),
+    dot_cluster_id(+, +, 1),
+    dot_cluster_id(+, +, 1, +).
 
 
 
@@ -89,7 +101,7 @@ dot_arc_id(Out, FromId, ToId) :-
 
 dot_arc_id(Out, FromId, ToId, Options) :-
   dot_attributes(Options, String),
-  format_debug(dot, Out, "  ~a -> ~a~s;", [FromId,ToId,String]).
+  format_debug(dot, Out, "    ~a -> ~a~s;", [FromId,ToId,String]).
 
 
 
@@ -121,6 +133,61 @@ dot_attribute(label, Value, Attr) :- !,
 % other attributes
 dot_attribute(Name, Value, Attr) :-
   format(string(Attr), "~a=\"~w\"", [Name,Value]).
+
+
+
+%! dot_cluster(+Out:stream, +Term:term, :Goal_1) is det.
+%! dot_cluster(+Out:stream, +Term:term, :Goal_1, +Options:dict) is det.
+
+dot_cluster(Out, Term, Goal_1) :-
+  dot_cluster(Out, Term, Goal_1, options{}).
+
+
+dot_cluster(Out, Term, Goal_1, Options) :-
+  dot_id(Term, Id),
+  dot_cluster_id(Out, Id, Goal_1, Options).
+
+
+
+%! dot_cluster_arc(+Out:stream, +FromTerm:term, +ToTerm:term) is det.
+%! dot_cluster_arc(+Out:stream, +FromTerm:term, +ToTerm:term, +Options:dict) is det.
+
+dot_cluster_arc(Out, FromTerm, ToTerm) :-
+  dot_cluster_arc(Out, FromTerm, ToTerm, options{}).
+
+
+dot_cluster_arc(Out, FromTerm, ToTerm, Options) :-
+  maplist(dot_id, [FromTerm,ToTerm], [FromId,ToId]),
+  dot_cluster_arc_id(Out, FromId, ToId, Options).
+
+
+
+%! dot_cluster_arc_id(+Out:stream, +FromId:atom, +ToId:atom) is det.
+%! dot_cluster_arc_id(+Out:stream, +FromId:atom, +ToId:atom, +Options:dict) is det.
+
+dot_cluster_arc_id(Out, FromId, ToId) :-
+  dot_cluster_arc_id(Out, FromId, ToId, options{}).
+
+
+dot_cluster_arc_id(Out, FromId, ToId, Options0) :-
+  merge_dicts(options{lhead: ToId, ltail: FromId}, Options0, Options),
+  dot_arc_id(Out, FromId, ToId, Options).
+
+
+
+%! dot_cluster_id(+Out:stream, +Id:atom, :Goal_1) is det.
+%! dot_cluster_id(+Out:stream, +Id:atom, :Goal_1, +Options:dict) is det.
+
+dot_cluster_id(Out, Id, Goal_1) :-
+  dot_cluster_id(Out, Id, Goal_1, options{}).
+
+
+dot_cluster_id(Out, Id, Goal_1, Options) :-
+  format_debug(dot, Out, "  subgraph cluster_~a {", [Id]),
+  dot_attributes(Options, String),
+  format_debug(dot, Out, "    graph ~s;", [String]),
+  call(Goal_1, Out),
+  format_debug(dot, Out, "  }").
 
 
 
@@ -163,7 +230,7 @@ dot_edge_id(Out, FromId, ToId) :-
 
 dot_edge_id(Out, FromId, ToId, Options) :-
   dot_attributes(Options, String),
-  format_debug(dot, Out, "  ~a -- ~a~s;", [FromId,ToId,String]).
+  format_debug(dot, Out, "    ~a -- ~a~s;", [FromId,ToId,String]).
 
 
 
@@ -229,7 +296,11 @@ dot_graph(Out, Goal_1, Options0) :-
   ),
   dot_graph_type(Directed, Type),
   format_debug(dot, Out, "~a ~s {", [Type,Name]),
-  merge_dicts(Options2, options{charset: 'UTF-8', colorscheme: svg}, Options3),
+  merge_dicts(
+    Options2,
+    options{charset: 'UTF-8', colorscheme: svg, compound: true},
+    Options3
+  ),
   dot_attributes(Options3, GraphAttrsString),
   format_debug(dot, Out, "  graph~s;", [GraphAttrsString]),
   call(Goal_1, Out),
@@ -332,4 +403,4 @@ dot_node_id(Out, Id) :-
 
 dot_node_id(Out, Id, Options) :-
   dot_attributes(Options, String),
-  format_debug(dot, Out, "  ~a~s;", [Id,String]).
+  format_debug(dot, Out, "    ~a~s;", [Id,String]).

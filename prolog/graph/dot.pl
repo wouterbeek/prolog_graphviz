@@ -39,6 +39,8 @@
 :- use_module(library(file_ext)).
 :- use_module(library(hash_ext)).
 
+:- use_module(dot_html).
+
 :- meta_predicate
     dot_graph(+, 1),
     dot_graph(+, 1, +).
@@ -103,6 +105,9 @@ dot_attributes(Options, String) :-
 dot_attribute(Name-Value, String) :-
   dot_attribute(Name, Value, String).
 
+% HTML-like label
+dot_attribute(html, Spec, Attr) :- !,
+  string_phrase(("label=<",dot_html(Spec),">"), Attr).
 % multi-line label
 dot_attribute(label, Values, Attr) :-
   is_list(Values), !,

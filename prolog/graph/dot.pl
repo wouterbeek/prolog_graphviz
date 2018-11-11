@@ -86,22 +86,22 @@ dot_arc_id(Out, FromId, ToId) :-
 
 
 dot_arc_id(Out, FromId, ToId, Options) :-
-  dot_attributes(Options, Str),
-  format_debug(dot, Out, "  ~a -> ~a~s;", [FromId,ToId,Str]).
+  dot_attributes(Options, String),
+  format_debug(dot, Out, "  ~a -> ~a~s;", [FromId,ToId,String]).
 
 
 
 %! dot_attributes(+Options:list(compound), -String:string) is det.
 
 dot_attributes([], "") :- !.
-dot_attributes(Options, Str) :-
-  maplist(dot_attribute, Options, Strs),
-  atomics_to_string(Strs, ",", Str0),
-  format(string(Str), " [~s]", [Str0]).
+dot_attributes(Options, String) :-
+  maplist(dot_attribute, Options, Strings),
+  atomics_to_string(Strings, ",", String0),
+  format(string(String), " [~s]", [String0]).
 
-dot_attribute(Option, Str) :-
+dot_attribute(Option, String) :-
   Option =.. [Name,Value],
-  dot_attribute(Name, Value, Str).
+  dot_attribute(Name, Value, String).
 
 % Multi-line label
 dot_attribute(label, Values, Attr) :-
@@ -157,8 +157,8 @@ dot_edge_id(Out, FromId, ToId) :-
 
 
 dot_edge_id(Out, FromId, ToId, Options) :-
-  dot_attributes(Options, Str),
-  format_debug(dot, Out, "  ~a -- ~a~s;", [FromId,ToId,Str]).
+  dot_attributes(Options, String),
+  format_debug(dot, Out, "  ~a -- ~a~s;", [FromId,ToId,String]).
 
 
 
@@ -175,27 +175,38 @@ dot_edge_id(Out, FromId, ToId, Options) :-
 %   * name(+atom)
 %
 %   The name of the graph.  Default is `noname`.
+%
+%   * strict(+boolean)
+%
+%   Value `true' indicates that the graph is strict, i.e., has no
+%   self-arcs and has not multi-edges.  Default is `false'.
+%
+%   This can only be used in combination with option `directed(true)',
+%   and throws an exception otherwise.
 
 dot_graph(Out, Goal_1) :-
   dot_graph(Out, Goal_1, []).
 
 
-dot_graph(Out, Goal_1, Options) :-
-  option(directed(Directed), Options, false),
+dot_graph(Out, Goal_1, Options1) :-
+  select_option(directed(Directed), Options1, Options2, false),
   must_be(boolean, Directed),
+  select_option(strict(Strict), Options2, Options3, false),
+  must_be(boolean, Strict),
+  (   Directed == false,
+      Strict == true
+  ->  throw(error(option_combination(directed(Directed),strict(Strict)),dot_graph/3))
+  ;   true
+  ),
   dot_graph_type(Directed, Type),
-  option(name(Name), Options, noname),
+  select_option(name(Name), Options3, Options4, noname),
   must_be(atom, Name),
   format_debug(dot, Out, "~a ~a {", [Type,Name]),
-  dot_graph_attributes(Out, Options),
+  merge_options([charset('UTF-8'),colorscheme(svg)], Options4, Options5),
+  dot_attributes(Options5, String),
+  format_debug(dot, Out, "  graph~s;", [String]),
   call(Goal_1, Out),
   format_debug(dot, Out, "}").
-
-dot_graph_attributes(Out, Options) :-
-  option(overlap(Overlap), Options), !,
-  must_be(boolean, Overlap),
-  format_debug(dot, Out, "  graph [overlap=~a];", [Overlap]).
-dot_graph_attributes(_, _).
 
 dot_graph_type(false, graph).
 dot_graph_type(true, digraph).
@@ -208,8 +219,8 @@ dot_graph_type(true, digraph).
 % DOT HTML labels with HTML elements: left and right angle bracket,
 % ampersand.
 
-dot_html_replace(Str1, Str2) :-
-  string_phrase(html_replace, Str1, Str2).
+dot_html_replace(String1, String2) :-
+  string_phrase(html_replace, String1, String2).
 
 html_replace, "&lt;" --> "<", !, html_replace.
 html_replace, "&gt;" --> ">", !, html_replace.
@@ -293,5 +304,5 @@ dot_node_id(Out, Id) :-
 
 
 dot_node_id(Out, Id, Options) :-
-  dot_attributes(Options, Str),
-  format_debug(dot, Out, "  ~a~s;", [Id,Str]).
+  dot_attributes(Options, String),
+  format_debug(dot, Out, "  ~a~s;", [Id,String]).

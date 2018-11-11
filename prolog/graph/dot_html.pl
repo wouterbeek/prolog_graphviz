@@ -46,7 +46,7 @@ table : <FONT> table </FONT>
 %! dot_html(+Spec:compound)// is det.
 
 % b
-dot_html(b(Spec)) -->
+dot_html(b(Spec)) --> !,
   html_element(b, [], dot_html:dot_html(Spec)).
 % br
 % - `ALIGN="CENTER|LEFT|RIGHT"`
@@ -100,7 +100,7 @@ dot_html(font(Attrs0,Spec)) --> !,
 dot_html(font(Spec)) --> !,
   dot_html(font([],Spec)).
 % i
-dot_html(i(Spec)) -->
+dot_html(i(Spec)) --> !,
   html_element(i, [], dot_html:dot_html(Spec)).
 % img
 % - `SCALE="FALSE|TRUE|WIDTH|HEIGHT|BOTH"`
@@ -109,16 +109,30 @@ dot_html(img(Attrs0)) --> !,
   {attributes_(Attrs0, Attrs)},
   html_element(img, Attrs).
 % o
-dot_html(o(Spec)) -->
+dot_html(o(Spec)) --> !,
   html_element(o, [], dot_html:dot_html(Spec)).
+dot_html(row_([vr|T])) --> !,
+  html_element(vr),
+  dot_html(row_(T)).
+dot_html(row_([H|T])) --> !,
+  dot_html(H),
+  dot_html(row_(T)).
+dot_html(row_([])) --> !, "".
+dot_html(rows_([hr|T])) --> !,
+  html_element(hr),
+  dot_html(rows_(T)).
+dot_html(rows_([H|T])) --> !,
+  html_element(tr, [], dot_html(row_(H))),
+  dot_html(rows_(T)).
+dot_html(rows_([])) --> !, "".
 % s
-dot_html(s(Spec)) -->
+dot_html(s(Spec)) --> !,
   html_element(s, [], dot_html:dot_html(Spec)).
 % sub
-dot_html(sub(Spec)) -->
+dot_html(sub(Spec)) --> !,
   html_element(sub, [], dot_html:dot_html(Spec)).
 % sup
-dot_html(sup(Spec)) -->
+dot_html(sup(Spec)) --> !,
   html_element(sup, [], dot_html:dot_html(Spec)).
 % table
 % - `ALIGN="CENTER|LEFT|RIGHT"`
@@ -148,20 +162,6 @@ dot_html(table(Specs)) --> !,
 dot_html(table(Attrs0,Rows)) --> !,
   {attributes_(Attrs0, Attrs)},
   html_element(table, Attrs, dot_html:dot_html(rows_(Rows))).
-dot_html(row_([vr|T])) --> !,
-  html_element(vr),
-  dot_html(row_(T)).
-dot_html(row_([H|T])) --> !,
-  dot_html(H),
-  dot_html(row_(T)).
-dot_html(row_([])) --> !, "".
-dot_html(rows_([hr|T])) --> !,
-  html_element(hr),
-  dot_html(rows_(T)).
-dot_html(rows_([H|T])) --> !,
-  html_element(tr, [], dot_html(row_(H))),
-  dot_html(rows_(T)).
-dot_html(rows_([])) --> !, "".
 % u
 dot_html(u(Spec)) --> !,
   html_element(u, [], dot_html:dot_html(Spec)).
@@ -170,7 +170,7 @@ dot_html(String) -->
   atom(String).
 % error
 dot_html(Spec) -->
-  syntax_error(dot_html_like_(Spec)).
+  syntax_error(dot_html_like_label(Spec)).
 
 attributes_(Attrs, Attrs) :-
   is_list(Attrs), !.

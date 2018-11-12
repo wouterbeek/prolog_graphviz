@@ -169,8 +169,10 @@ dot_cluster_arc_id(Out, FromId, ToId) :-
   dot_cluster_arc_id(Out, FromId, ToId, options{}).
 
 
-dot_cluster_arc_id(Out, FromId, ToId, Options0) :-
-  merge_dicts(options{lhead: ToId, ltail: FromId}, Options0, Options),
+dot_cluster_arc_id(Out, FromId0, ToId0, Options0) :-
+  maplist(atom_concat(cluster_), [FromId0,ToId0], [LTail,LHead]),
+  maplist(atom_concat(dummy_), [FromId0,ToId0], [FromId,ToId]),
+  merge_dicts(options{lhead: LHead, ltail: LTail}, Options0, Options),
   dot_arc_id(Out, FromId, ToId, Options).
 
 
@@ -185,7 +187,8 @@ dot_cluster_id(Out, Id, Goal_1) :-
 dot_cluster_id(Out, Id, Goal_1, Options) :-
   format_debug(dot, Out, "  subgraph cluster_~a {", [Id]),
   dot_attributes(Options, String),
-  format_debug(dot, Out, "    graph ~s;", [String]),
+  format_debug(dot, Out, "    graph~s;", [String]),
+  format_debug(dot, Out, '    dummy_~a [label="",shape="none"];', [Id]),
   call(Goal_1, Out),
   format_debug(dot, Out, "  }").
 

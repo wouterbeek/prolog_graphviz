@@ -39,6 +39,7 @@ table : <FONT> table </FONT>
 :- use_module(library(dcg)).
 :- use_module(library(dcg/dcg_abnf)).
 :- use_module(library(dcg/dcg_html)).
+:- use_module(library(graph/dot)).
 
 
 
@@ -168,7 +169,8 @@ dot_html(u(Spec)) --> !,
   html_element(u, [], dot_html:dot_html(Spec)).
 dot_html(String) -->
   {string(String)}, !,
-  atom(String).
+  {dot_html_replace(String, EscapedString)},
+  atom(EscapedString).
 % error
 dot_html(Spec) -->
   syntax_error(dot_html_like_label(Spec)).

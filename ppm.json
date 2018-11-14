@@ -1,7 +1,0 @@
-{
-  "dependencies": [
-    {"user": "wouterbeek", "repo": "Prolog-Library-Collection"}
-  ],
-  "description": "Graph export library for Prolog, based on GraphViz.",
-  "keywords": ["DOT","export","graph","GraphViz","visualization"]
-}

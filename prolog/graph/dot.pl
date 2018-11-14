@@ -105,34 +105,54 @@ dot_arc_id(Out, FromId, ToId, Options) :-
 
 
 
-%! dot_attributes(+Options:dict, -String:string) is det.
-
-dot_attributes(options{}, "") :- !.
-dot_attributes(Options, String) :-
-  dict_pairs(Options, Pairs),
-  maplist(dot_attribute, Pairs, Strings),
-  atomics_to_string(Strings, ",", String0),
-  format(string(String), " [~s]", [String0]).
+%! dot_attribute(+Pair:pair(atom,term), -String:string) is semidet.
 
 dot_attribute(Name-Value, String) :-
-  dot_attribute(Name, Value, String).
+  dot_attribute_(Name, Value, String).
 
 % HTML-like label
-dot_attribute(html, Spec, Attr) :- !,
+dot_attribute_(html, Spec, Attr) :- !,
   string_phrase(("label=<",dot_html(Spec),">"), Attr).
 % multi-line label
-dot_attribute(label, Values, Attr) :-
+dot_attribute_(label, Values, Attr) :-
   is_list(Values), !,
   maplist([Value,Line]>>format(string(Line), "~w", [Value]), Values, Lines),
   atomics_to_string(Lines, "<BR/>", Unescaped),
   dot_html_replace(Unescaped, Escaped),
   format(string(Attr), "label=<~s>", [Escaped]).
 % single-line label
-dot_attribute(label, Value, Attr) :- !,
-  dot_attribute(label, [Value], Attr).
-% other attributes
-dot_attribute(Name, Value, Attr) :-
-  format(string(Attr), "~a=\"~w\"", [Name,Value]).
+dot_attribute_(label, Value, Attr) :- !,
+  dot_attribute_(label, [Value], Attr).
+% Another DOT attribute.
+dot_attribute_(Key, Value, Attr) :-
+  dot_attribute_(Key), !,
+  format(string(Attr), "~a=\"~w\"", [Key,Value]).
+
+dot_attribute_(arrowhead).
+dot_attribute_(charset).
+dot_attribute_(colorscheme).
+dot_attribute_(compound).
+dot_attribute_(lhead).
+dot_attribute_(ltail).
+dot_attribute_(shape).
+
+
+
+%! dot_attributes(+Options:dict, -String:string) is det.
+
+dot_attributes(options{}, "") :- !.
+dot_attributes(Options, String) :-
+  dict_pairs(Options, Pairs),
+  findall(
+    String,
+    (
+      member(Pair, Pairs),
+      dot_attribute(Pair, String)
+    ),
+    Strings
+  ),
+  atomics_to_string(Strings, ",", String0),
+  format(string(String), " [~s]", [String0]).
 
 
 
@@ -140,7 +160,7 @@ dot_attribute(Name, Value, Attr) :-
 %! dot_cluster(+Out:stream, +Term:term, :Goal_1, +Options:dict) is det.
 
 dot_cluster(Out, Term, Goal_1) :-
-  dot_cluster(Out, Term, Goal_1, options{}).
+  dot_cluster(Out, Term, Goal_1, options{label: Term}).
 
 
 dot_cluster(Out, Term, Goal_1, Options) :-

@@ -1,3 +1,4 @@
+
 :- encoding(utf8).
 :- module(
   dot_html,
@@ -167,6 +168,10 @@ dot_html(table(Attrs0,Rows)) --> !,
 % u
 dot_html(u(Spec)) --> !,
   html_element(u, [], dot_html:dot_html(Spec)).
+dot_html([]) --> !, "".
+dot_html([H|T]) --> !,
+  dot_html(H),
+  dot_html(T).
 dot_html(String) -->
   {string(String)}, !,
   {dot_html_replace(String, EscapedString)},

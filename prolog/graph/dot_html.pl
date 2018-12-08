@@ -1,4 +1,3 @@
-
 :- encoding(utf8).
 :- module(
   dot_html,

@@ -7,22 +7,34 @@
 #+HTML_HEAD: <script type="text/javascript" src="https://www.pirilampo.org/styles/lib/js/jquery.stickytableheaders.js"></script>
 #+HTML_HEAD: <script type="text/javascript" src="https://www.pirilampo.org/styles/readtheorg/js/readtheorg.js"></script>
 
-A simple graph export library for SWI-Prolog.
+A library for exporting graphs from SWI-Prolog.  Currently the
+following formats are supported:
+
+  - GraphViz DOT
+  - Graph Markup Language (GML)
+
+Please report any issues that you find when using this library.
 
 * Installation
 
   1. Install [[http://www.swipl-prolog.org][SWI-Prolog]].
-  2. Install GraphViz:
-    + ~$ sudo apt install graphviz~ on Debian-based distro's, e.g., Ubuntu.
-    + ~$ sudo dnf install graphviz~ on Red Hat-based distro's, e.g., Fedora.
-  3. Start SWI-Prolog and install this library through the Prolog
-     package manager:
-     ~pack_install('git://github.com/wouterbeek/graph_export').~
+  2. Install [[https://github.com/wouterbeek/Prolog-Library-Collection][Prolog-Library-Collection]].
+  3. Clone this library: ~git clone https://github.com/wouterbeek/graph_export~
+  4. Add the following line to your ~.swiplrc~ file:
+
+#+BEGIN_SRC prolog
+user:file_search_path(library, '/your/path/to/graph_export/prolog').
+#+END_SRC
+
+In order to generate DOT visualizations, install GraphViz:
+
+  - ~$ sudo apt install graphviz~ on Debian-based distro's (e.g., Ubuntu).
+  - ~$ sudo dnf install graphviz~ on Red Hat-based distro's (e.g., Fedora).
 
 * Simple usage
 
-Once installed, this library can by imported with the following
-command:
+Once installed, modules from this library can by imported in the
+following way:
 
 #+BEGIN_SRC prolog
 ?- [library(graph/gv)].

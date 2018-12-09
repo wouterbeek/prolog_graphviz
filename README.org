@@ -1,5 +1,5 @@
-#+author: Wouter Beek
-#+title: ~graph_export~
+#+TITLE: ~prolog_graph_export~
+#+AUTHOR: Wouter Beek
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="https://www.pirilampo.org/styles/readtheorg/css/htmlize.css"/>
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="https://www.pirilampo.org/styles/readtheorg/css/readtheorg.css"/>
 #+HTML_HEAD: <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
@@ -23,15 +23,15 @@ Please report any issues that you find when using this library.
   4. Add the following line to your ~.swiplrc~ file:
 
 #+BEGIN_SRC prolog
-user:file_search_path(library, '/your/path/to/graph_export/prolog').
+user:file_search_path(library, '/your/path/to/prolog_graph_export/prolog').
 #+END_SRC
 
-In order to generate DOT visualizations, install GraphViz:
+  5. In order to generate DOT visualizations, install GraphViz:
 
-  - ~$ sudo apt install graphviz~ on Debian-based distro's (e.g., Ubuntu).
-  - ~$ sudo dnf install graphviz~ on Red Hat-based distro's (e.g., Fedora).
+    - ~$ sudo apt install graphviz~ on Debian-based distro's (e.g., Ubuntu).
+    - ~$ sudo dnf install graphviz~ on Red Hat-based distro's (e.g., Fedora).
 
-* Simple usage
+* Usage
 
 Once installed, modules from this library can by imported in the
 following way:

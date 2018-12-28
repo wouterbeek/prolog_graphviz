@@ -18,18 +18,25 @@ Please report any issues that you find when using this library.
 * Installation
 
   1. Install [[http://www.swipl-prolog.org][SWI-Prolog]].
+
   2. Install [[https://github.com/wouterbeek/Prolog-Library-Collection][Prolog-Library-Collection]].
-  3. Clone this library: ~git clone https://github.com/wouterbeek/graph_export~
+
+  3. Clone this library: ~git clone
+     https://github.com/wouterbeek/graph_export~.
+
   4. Add the following line to your ~.swiplrc~ file:
 
-#+BEGIN_SRC prolog
-user:file_search_path(library, '/your/path/to/prolog_graph_export/prolog').
-#+END_SRC
+     #+BEGIN_SRC prolog
+     user:file_search_path(library, '/your/path/to/prolog_graph_export/prolog').
+     #+END_SRC
 
   5. In order to generate DOT visualizations, install GraphViz:
 
-    - ~$ sudo apt install graphviz~ on Debian-based distro's (e.g., Ubuntu).
-    - ~$ sudo dnf install graphviz~ on Red Hat-based distro's (e.g., Fedora).
+    - ~sudo apt install graphviz~ on Debian-based distro's (e.g.,
+      Ubuntu).
+
+    - ~sudo dnf install graphviz~ on Red Hat-based distro's (e.g.,
+      Fedora).
 
 * Usage
 
@@ -303,30 +310,30 @@ Strings must adhere to the following BNF grammar for DOT HTML-like
 labels:
 
 #+BEGIN_SRC bnf
-label :   text
-        | table
-text :   textitem
-       | text textitem
-textitem :   string
-           | <BR/>
-           | <FONT> text </FONT>
-           | <I> text </I>
-           | <B> text </B>
-           | <U> text </U>
-           | <O> text </O>
-           | <SUB> text </SUB>
-           | <SUP> text </SUP>
-           | <S> text </S>
+label : text
+      | table
+text : textitem
+     | text textitem
+textitem : string
+         | <BR/>
+         | <FONT> text </FONT>
+         | <I> text </I>
+         | <B> text </B>
+         | <U> text </U>
+         | <O> text </O>
+         | <SUB> text </SUB>
+         | <SUP> text </SUP>
+         | <S> text </S>
 table : [ <FONT> ] <TABLE> rows </TABLE> [ </FONT> ]
-rows :   row
-       | rows row
-       | rows <HR/> row
+rows : row
+     | rows row
+     | rows <HR/> row
 row: <TR> cells </TR>
-cells :   cell
-        | cells cell
-        | cells <VR/> cell
-cell:   <TD> label </TD>
-      | <TD> <IMG/> </TD>
+cells : cell
+      | cells cell
+      | cells <VR/> cell
+cell: <TD> label </TD>
+    | <TD> <IMG/> </TD>
 #+END_SRC
 
 In addition to the above BNF grammar, tags are allowed to have

@@ -1,11 +1,11 @@
-#+TITLE: ~prolog_graph_export~
-#+AUTHOR: Wouter Beek
-#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="https://www.pirilampo.org/styles/readtheorg/css/htmlize.css"/>
-#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="https://www.pirilampo.org/styles/readtheorg/css/readtheorg.css"/>
-#+HTML_HEAD: <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-#+HTML_HEAD: <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
-#+HTML_HEAD: <script type="text/javascript" src="https://www.pirilampo.org/styles/lib/js/jquery.stickytableheaders.js"></script>
-#+HTML_HEAD: <script type="text/javascript" src="https://www.pirilampo.org/styles/readtheorg/js/readtheorg.js"></script>
+#+title: ~prolog_graph_export~
+#+author: Wouter Beek
+#+html_head: <link rel="stylesheet" type="text/css" href="https://www.pirilampo.org/styles/readtheorg/css/htmlize.css"/>
+#+html_head: <link rel="stylesheet" type="text/css" href="https://www.pirilampo.org/styles/readtheorg/css/readtheorg.css"/>
+#+html_head: <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+#+html_head: <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+#+html_head: <script type="text/javascript" src="https://www.pirilampo.org/styles/lib/js/jquery.stickytableheaders.js"></script>
+#+html_head: <script type="text/javascript" src="https://www.pirilampo.org/styles/readtheorg/js/readtheorg.js"></script>
 
 A library for exporting graphs from SWI-Prolog.  Currently the
 following formats are supported:
@@ -17,35 +17,38 @@ Please report any issues that you find when using this library.
 
 * Installation
 
-  1. Install [[http://www.swipl-prolog.org][SWI-Prolog]].
+1. Install [[http://www.swipl-prolog.org][SWI-Prolog]].
 
-  2. Install [[https://github.com/wouterbeek/Prolog-Library-Collection][Prolog-Library-Collection]].
+2. Install [[https://github.com/wouterbeek/Prolog-Library-Collection][Prolog-Library-Collection]].
 
-  3. Clone this library: ~git clone
-     https://github.com/wouterbeek/graph_export~.
+3. Clone this library:
 
-  4. Add the following line to your ~.swiplrc~ file:
+#+begin_src sh
+git clone https://github.com/wouterbeek/prolog_graph_export
+#+end_src
 
-     #+BEGIN_SRC prolog
-     user:file_search_path(library, '/your/path/to/prolog_graph_export/prolog').
-     #+END_SRC
+4. Add the following line to your ~.swiplrc~ file:
 
-  5. In order to generate DOT visualizations, install GraphViz:
+   #+begin_src prolog
+   user:file_search_path(library, '/your/path/to/prolog_graph_export/prolog').
+   #+end_src
 
-    - ~sudo apt install graphviz~ on Debian-based distro's (e.g.,
-      Ubuntu).
+5. In order to generate DOT visualizations, install GraphViz:
 
-    - ~sudo dnf install graphviz~ on Red Hat-based distro's (e.g.,
-      Fedora).
+   - ~sudo apt install graphviz~ on Debian-based distro's (e.g.,
+     Ubuntu).
+
+   - ~sudo dnf install graphviz~ on Red Hat-based distro's (e.g.,
+     Fedora).
 
 * Usage
 
 Once installed, modules from this library can by imported in the
 following way:
 
-#+BEGIN_SRC prolog
+#+begin_src prolog
 ?- [library(graph/gv)].
-#+END_SRC
+#+end_src
 
 ** Exporting a single node
 
@@ -55,9 +58,9 @@ Prolog output stream.  The following example shows how to write a
 graph consisting of one node, and open the result in a GraphViz
 viewer:
 
-#+BEGIN_SRC prolog
+#+begin_src prolog
 ?- gv_view([Out]>>format(Out, "x [label=<Hello,<BR/>world!>,shape=diamond];\n", [])).
-#+END_SRC
+#+end_src
 
 This opens the following image inside a GraphViz-compatible viewer:
 
@@ -67,9 +70,9 @@ This opens the following image inside a GraphViz-compatible viewer:
 
 In this example we write a graph that consists of a single edge:
 
-#+BEGIN_SRC prolog
+#+begin_src prolog
 ?- gv_export('loves.svg', [Out]>>format(Out, "John -- Mary [label=loves]", [])).
-#+END_SRC
+#+end_src
 
 This writes the following image to an SVG file.  See the table in
 Section [[Output formats]] for a full list of supported output formats.
@@ -96,10 +99,10 @@ labels (see Section [[HTML-like labels]]).
 Suppose your program returns proof trees that consist of an entailment
 rule label, a conclusion, and an arbitrary number of premises:
 
-#+BEGIN_SRC prolog
+#+begin_src prolog
 ?- Proof = t(rdfs(3),isa(class,class),[t(axiom(rdfs),range(range,class),[]),
                                        t(axiom(rdfs),range(subClassOf,class),[])]).
-#+END_SRC
+#+end_src
 
 The following program exports such proof trees.  Notice that this
 program uses the support predicates.  This allows the nodes to be
@@ -108,7 +111,7 @@ this results in simplified code because.  Since these support
 predicates are idempotent, emitting the same node/edge multiple times
 does not accidentally change the exported graph.
 
-#+BEGIN_SRC prolog
+#+begin_src prolog
 :- use_module(library(apply)).
 :- use_module(library(graph/gv)).
 :- use_module(library(yall)).
@@ -128,7 +131,7 @@ export_subproof(Out, Node, Tree) :-
   dot_node(Out, Concl),
   dot_arc(Out, Node, Concl),
   export_proof(Out, Tree).
-#+END_SRC
+#+end_src
 
 Since we use the predicate ~dot_arc/3~, we must specify option
 ~directed(true)~ (graphs are undirected by default).
@@ -136,9 +139,9 @@ Since we use the predicate ~dot_arc/3~, we must specify option
 In order to open a specific proof tree, like ~$Proof~, in a
 GraphViz-compatible viewer, we make the following call:
 
-#+BEGIN_SRC prolog
+#+begin_src prolog
 ?- view_proof($Proof).
-#+END_SRC
+#+end_src
 
 This produces the following visualization:
 
@@ -148,14 +151,14 @@ This produces the following visualization:
 
 Suppose your program returns syntactic parse trees like the following:
 
-#+BEGIN_SRC prolog
+#+begin_src prolog
 ?- Tree = s(np(det(the),n(cat)),vp(v(loves),np(det(the),n(dog))))
-#+END_SRC
+#+end_src
 
 The following code exports such parse trees to SVG (see
 ~example/parse_tree.pl~):
 
-#+BEGIN_SRC prolog
+#+begin_src prolog
 :- use_module(library(apply)).
 :- use_module(library(graph/gv)).
 :- use_module(library(yall)).
@@ -169,7 +172,7 @@ export_tree(Out, Tree, Id) :-
   dot_node_id(Out, Id, [label(Op)]),
   maplist(export_tree(Out), Trees, Ids),
   maplist(dot_edge_id(Out, Id), Ids).
-#+END_SRC
+#+end_src
 
 Notice that in the above program we use ~dot_node_id/3~ instead of
 ~dot_node/3~ and ~dot_edge_id/3~ instead of ~dot_edge/3~.  The ~*_id~
@@ -179,9 +182,9 @@ IDs are generated with ~dot_id/1~.
 We can generate the visualization for the above syntax tree (~$Tree~),
 by making the following call:
 
-#+BEGIN_SRC prolog
+#+begin_src prolog
 ?- export_tree($Tree).
-#+END_SRC
+#+end_src
 
 This prodices the following result:
 
@@ -309,7 +312,7 @@ string represents one line in a multi-line label.
 Strings must adhere to the following BNF grammar for DOT HTML-like
 labels:
 
-#+BEGIN_SRC bnf
+#+begin_src bnf
 label : text
       | table
 text : textitem
@@ -334,7 +337,7 @@ cells : cell
       | cells <VR/> cell
 cell: <TD> label </TD>
     | <TD> <IMG/> </TD>
-#+END_SRC
+#+end_src
 
 In addition to the above BNF grammar, tags are allowed to have
 attributes that are formatted similar to HTML attributes.  Different

@@ -18,7 +18,7 @@
 /** <module> GraphViz export
 
 @author Wouter Beek
-@version 2018
+@version 2018-2019
 */
 
 :- use_module(library(error)).
@@ -213,8 +213,10 @@ gv_format_media_type(Format2, MediaType) :-
 %! gv_format_type(-Format:atom, -Type:gv_type) is nondet.
 
 gv_format_type(Format1, Type) :-
-  gv_format_synonym_(Format1, Format2),
-  gv_format_type_(Format2, Type).
+  call_det_when_ground(Format1, (
+    gv_format_synonym_(Format1, Format2),
+    gv_format_type_(Format2, Type)
+  )).
 
 gv_format_synonym_(Format1, Format2) :-
   gv_format_synonym__(Format1, Format2).

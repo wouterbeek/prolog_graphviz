@@ -17,8 +17,6 @@
 
 /** <module> GraphViz export
 
-@author Wouter Beek
-@version 2018-2019
 */
 
 :- use_module(library(error)).

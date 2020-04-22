@@ -1,5 +1,5 @@
 :- use_module(library(apply)).
-:- use_module(library(graph/gv)).
+:- use_module(library(gv)).
 :- use_module(library(yall)).
 
 run :-

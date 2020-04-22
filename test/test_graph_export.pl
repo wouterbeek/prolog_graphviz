@@ -5,7 +5,7 @@
 :- use_module(library(process)).
 :- use_module(library(yall)).
 
-:- use_module(library(graph/gv)).
+:- use_module(library(gv)).
 :- use_module(library(os_ext)).
 
 :- meta_predicate

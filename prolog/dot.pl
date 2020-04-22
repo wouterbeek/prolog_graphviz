@@ -31,9 +31,8 @@
 
 /* <module> DOT serialization
 
-@author Wouter Beek
 @see https://www.graphviz.org
-@version 2018
+
 */
 
 :- use_module(library(apply)).

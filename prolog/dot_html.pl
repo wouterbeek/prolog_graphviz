@@ -27,19 +27,16 @@ table : <FONT> table </FONT>
       | <TABLE> (row (<HR/>)?)* </TABLE>
 ```
 
----
-
-@author Wouter Beek
 @see http://www.graphviz.org/content/node-shapes#html
-@version 2015-2018
+
 */
 
 :- use_module(library(error)).
 
+:- use_module(library(abnf)).
 :- use_module(library(dcg)).
-:- use_module(library(dcg/dcg_abnf)).
-:- use_module(library(dcg/dcg_html)).
-:- use_module(library(graph/dot)).
+:- use_module(library(dcg_html)).
+:- use_module(library(dot)).
 
 
 

@@ -1,5 +1,3 @@
-:- begin_tests(gv).
-
 :- use_module(library(apply)).
 :- use_module(library(plunit)).
 :- use_module(library(process)).
@@ -12,9 +10,7 @@
     test_gv_export(+, 1),
     test_gv_export(+, 1, +).
 
-
-
-
+:- begin_tests(gv).
 
 test(hello, [cleanup(delete_file(File))]) :-
   File = 'hello.pdf',

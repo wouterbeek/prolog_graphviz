@@ -1,5 +1,19 @@
-:- use_module(library(gv)).
+:- module(loves, [export/0, view/0]).
+
+/** <module> John loves Mary example
+
+*/
+
 :- use_module(library(yall)).
 
-run :-
-  gv_export('loves.svg', [Out]>>format(Out, "John -- Mary [label=loves]", [])).
+:- use_module(library(gv)).
+
+dot("John -- Mary [label=loves];\n").
+
+export :-
+  dot(String),
+  gv_export('loves.svg', {String}/[Out]>>format(Out, String, [])).
+
+view :-
+  dot(String),
+  gv_view({String}/[Out]>>format(Out, String, [])).

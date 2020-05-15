@@ -1,3 +1,0 @@
-graph noname {
-  x [label=<Hello,<BR/>world!>]
-}

@@ -32,9 +32,9 @@ following way:
 
 The basic feature of this library is that it allows you to write to a
 GraphViz output file or to a GraphViz viewer by simply writing to a
-Prolog output stream.  The following example shows how to write a
-graph consisting of one node, and open the result in a GraphViz
-viewer:
+Prolog output stream.  The following example (see
+[`example/hello.pl`](example/hello.pl)) shows how to write a graph
+consisting of one node, and open the result in a GraphViz viewer:
 
 ```pl
 ?- gv_view([Out]>>format(Out, "x [label=<Hello,<BR/>world!>,shape=diamond];\n", [])).
@@ -42,20 +42,22 @@ viewer:
 
 This opens the following image inside a GraphViz-compatible viewer:
 
-![](./example/hello.svg)
+![](example/hello.svg)
 
 ### Exporting a single edge
 
-In this example we write a graph that consists of a single edge:
+In this example (see [`example/loves.pl`](example/loves.pl)) we write
+a graph that consists of a single edge:
 
 ```pl
-?- gv_export('loves.svg', [Out]>>format(Out, "John -- Mary [label=loves]", [])).
+?- gv_export('loves.svg', [Out]>>format(Out, "John -- Mary [label=loves];\n", [])).
 ```
 
 This writes the following image to an SVG file.  See the table in
-Section [[Output formats]] for a full list of supported output formats.
+Section [Output formats](#output-formats-option-format1) for a full
+list of supported output formats.
 
-![](./example/loves.svg)
+![](example/loves.svg)
 
 ## Advanced use
 
@@ -70,7 +72,7 @@ library's support predicates.  The most important ones are:
 `dot_arc/4` and `dot_edge/4` take a list of options that are emitted
 as GraphViz attributes.  Option `label(+or([string,list(string)]))`
 allows (multi-line) Unicode labels to be emitted using HTML-like
-labels (see Section [[HTML-like labels]]).
+labels (see Section [HTML-like labels](#html-like-labels)).
 
 ### Exporting a proof tree
 
@@ -78,16 +80,18 @@ Suppose your program returns proof trees that consist of an entailment
 rule label, a conclusion, and an arbitrary number of premises:
 
 ```pl
-?- Proof = t(rdfs(3),isa(class,class),[t(axiom(rdfs),range(range,class),[]),
-                                       t(axiom(rdfs),range(subClassOf,class),[])]).
+?- Proof = t(rdfs(3),∈(class,class),[t(axiom(rdfs),range(range,class),[]),
+                                     t(axiom(rdfs),range(⊆,class),[])]).
 ```
 
-The following program exports such proof trees.  Notice that this
-program uses the support predicates.  This allows the nodes to be
-characterized by Prolog terms instead of DOT IDs.  For most programs
-this results in simplified code because.  Since these support
-predicates are idempotent, emitting the same node/edge multiple times
-does not accidentally change the exported graph.
+The following program (see
+[`example/proof_tree.pl`](example/proof_tree.pl)) exports such proof
+trees.  Notice that this program uses the support predicates.  This
+allows the nodes to be characterized by Prolog terms instead of DOT
+IDs.  For most programs this results in simplified code because.
+Since these support predicates are idempotent, emitting the same
+node/edge multiple times does not accidentally change the exported
+graph.
 
 ```pl
 :- use_module(library(apply)).
@@ -123,7 +127,7 @@ GraphViz-compatible viewer, we make the following call:
 
 This produces the following visualization:
 
-![](./example/proof_tree.svg)
+![](example/proof_tree.svg)
 
 ### Exporting a parse trees
 
@@ -134,7 +138,7 @@ Suppose your program returns syntactic parse trees like the following:
 ```
 
 The following code exports such parse trees to SVG (see
-`example/parse_tree.pl`):
+[`example/parse_tree.pl`](example/parse_tree.pl)):
 
 ```pl
 :- use_module(library(apply)).
@@ -166,7 +170,7 @@ by making the following call:
 
 This prodices the following result:
 
-![](./example/parse_tree.svg)
+![](example/parse_tree.svg)
 
 Notice that we create a new DOT ID (`dot_id/1`) for each node in the
 tree.  Because of this, the two occurrences of ‘the’ can be

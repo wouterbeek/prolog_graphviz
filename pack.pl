@@ -6,4 +6,4 @@ name(prolog_graphviz).
 packager('Wouter Beek', 'wouter@triply.cc').
 requires(prolog_library_collection).
 title('Prolog Graph Visualization').
-version('1.0.2').
+version('1.0.3').

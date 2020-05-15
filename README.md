@@ -13,7 +13,7 @@ dnf install graphviz # Fedora, Red Hat
 
 ## Installation
 
-Run the following in [SWI-Prolog](https://www.swipl-prolog.org):
+Run the following in [SWI-Prolog](https://www.swi-prolog.org):
 
 ```pl
 pack_install(prolog_graphviz).

@@ -6,4 +6,4 @@ maintainer('Wouter Beek', 'wouter@triply.cc').
 name(prolog_graphviz).
 packager('Wouter Beek', 'wouter@triply.cc').
 title('Prolog Graph Visualization').
-version('1.0.0').
+version('1.0.1').

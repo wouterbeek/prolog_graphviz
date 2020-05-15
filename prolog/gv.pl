@@ -13,7 +13,7 @@
     gv_method/1             % ?Method
   ]
 ).
-:- reexport(library(graph/dot)).
+:- reexport(library(dot)).
 
 /** <module> GraphViz export
 

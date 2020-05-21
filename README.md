@@ -4,7 +4,9 @@ A library for visualizing graphs in Prolog.
 
 ## Dependencies
 
-Install GraphViz:
+  1. Install [SWI-Prolog](https://www.swi-prolog.org).
+
+  2. Install GraphViz:
 
 ```sh
 apt install graphviz # Debian, Ubuntu
@@ -13,16 +15,15 @@ dnf install graphviz # Fedora, Red Hat
 
 ## Installation
 
-Run the following in [SWI-Prolog](https://www.swi-prolog.org):
+Install this library:
 
-```pl
-pack_install(prolog_graphviz).
+```sh
+swipl -g 'pack_install(prolog_graphviz)' -t halt
 ```
 
 ## Use
 
-Once installed, modules from this library can by imported in the
-following way:
+Once installed, modules from this library are loaded as follows:
 
 ```pl
 ?- [library(gv)].

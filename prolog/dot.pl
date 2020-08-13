@@ -294,16 +294,14 @@ dot_graph(Out, Goal_1, Options0) :-
     options{directed: false, name: "noname", overlap: false, strict: false},
     Options1
   ),
-  % Obtain values for all options.
-  dict_select(
-    _{directed: Directed, name: Name, overlap: Overlap, strict: Strict},
-    Options1,
-    Options2
-  ),
   % Typecheck all option values.
+  dict_select(directed, Options1, Options2, Directed),
   must_be(boolean, Directed),
+  dict_select(name, Options2, Options3, Name),
   must_be(string, Name),
+  dict_select(overlap, Options3, Options4, Overlap),
   must_be(boolean, Overlap),
+  dict_select(strict, Options4, Options5, Strict),
   must_be(boolean, Strict),
   % Check for forbidden combinations of option values.
   (   Directed == false,
@@ -319,11 +317,11 @@ dot_graph(Out, Goal_1, Options0) :-
   dot_graph_type(Directed, Type),
   format_debug(dot, Out, "~a ~s {", [Type,Name]),
   merge_dicts(
-    Options2,
+    Options5,
     options{charset: 'UTF-8', colorscheme: svg, compound: true},
-    Options3
+    Options6
   ),
-  dot_attributes(Options3, GraphAttrsString),
+  dot_attributes(Options6, GraphAttrsString),
   format_debug(dot, Out, "  graph~s;", [GraphAttrsString]),
   call(Goal_1, Out),
   format_debug(dot, Out, "}").

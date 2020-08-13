@@ -101,9 +101,14 @@ gv_export_default_format_(File, DefaultFormat) :-
 gv_export_default_format_(_, DefaultFormat) :-
   setting(default_gv_export_format, DefaultFormat).
 
-%! gv_options_(+Options0:dict, +DefaultFormat:gv_format, -Format:gv_format, -Type:gv_type, -Method:gv_method, -Options:dict) is det.
+%! gv_options_(+Options0:dict,
+%!             +DefaultFormat:gv_format,
+%!             -Format:gv_format,
+%!             -Type:gv_type,
+%!             -Method:gv_method,
+%!             -Options:dict) is det.
 
-gv_options_(Options0, DefaultFormat, Format, Type, Method, Options2) :-
+gv_options_(Options0, DefaultFormat, Format, Type, Method, Options3) :-
   % Set default option values.
   setting(default_gv_method, DefaultMethod),
   merge_dicts(
@@ -111,10 +116,10 @@ gv_options_(Options0, DefaultFormat, Format, Type, Method, Options2) :-
     options{format: DefaultFormat, method: DefaultMethod},
     Options1
   ),
-  % Obtain values for all options.
-  dict_select(_{format: Format, method: Method}, Options1, Options2),
-  % Typecheck all option values.
+  % Typecheck option values.
+  dict_select(format, Options1, Options2, Format),
   call_must_be(gv_format, Format),
+  dict_select(method, Options2, Options3, Method),
   call_must_be(gv_method, Method),
   gv_format_type(Format, Type).
 

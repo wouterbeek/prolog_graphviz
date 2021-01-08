@@ -1,12 +1,13 @@
-# Prolog Graph Visualization
+# Prolog-based graph visualization
 
-A library for visualizing graphs in Prolog.
+A Prolog-based library for visualizing graphs that uses the GraphViz
+library.
 
 ## Dependencies
 
   1. Install [SWI-Prolog](https://www.swi-prolog.org).
 
-  2. Install GraphViz:
+  2. Install the GraphViz library:
 
 ```sh
 apt install graphviz # Debian, Ubuntu

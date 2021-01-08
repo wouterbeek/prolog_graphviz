@@ -115,10 +115,10 @@ dot_attribute_(html, Spec, Attr) :- !,
 % multi-line label
 dot_attribute_(label, Values, Attr) :-
   is_list(Values), !,
-  maplist([Value,Line]>>format(string(Line), "~w", [Value]), Values, Lines),
-  atomics_to_string(Lines, "<BR/>", Unescaped),
-  dot_html_replace(Unescaped, Escaped),
-  format(string(Attr), "label=<~s>", [Escaped]).
+  maplist([Value,Line]>>format(string(Line), "~w", [Value]), Values, Lines1),
+  maplist(dot_html_replace, Lines1, Lines2),
+  atomics_to_string(Lines2, "<BR/>", Lines3),
+  format(string(Attr), "label=<~s>", [Lines3]).
 % single-line label
 dot_attribute_(label, Value, Attr) :- !,
   dot_attribute_(label, [Value], Attr).

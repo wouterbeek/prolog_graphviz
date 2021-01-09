@@ -53,7 +53,7 @@
 % EXPORT/VIEW %
 
 %! gv_export(+File:atom, :Goal_1) is det.
-%! gv_export(+File:atom, :Goal_1, +Options:dict) is det.
+%! gv_export(+File:atom, :Goal_1, +Options:options) is det.
 %
 % @arg File is the name of the file to which the graph export is
 %      written.
@@ -106,7 +106,7 @@ gv_export_default_format_(_, DefaultFormat) :-
 %!             -Format:gv_format,
 %!             -Type:gv_type,
 %!             -Method:gv_method,
-%!             -Options:dict) is det.
+%!             -Options:options) is det.
 
 gv_options_(Options0, DefaultFormat, Format, Type, Method, Options3) :-
   % Set default option values.
@@ -150,7 +150,7 @@ gv_export_stream_(Goal_1, Format, Type, Method, Options, Out) :-
 
 
 %! gv_view(:Goal_1) is det.
-%! gv_view(:Goal_1, +Options:dict) is det.
+%! gv_view(:Goal_1, +Options:options) is det.
 %
 % Generate a GraphViz graph visualization and open the result in a
 % viewer application.

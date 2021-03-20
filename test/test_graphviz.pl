@@ -43,7 +43,7 @@ test(parse_tree, [cleanup(delete_file(File))]) :-
 
 export_tree_(Out, Tree, Id) :-
   Tree =.. [Op|Trees],
-  dot_id(Id),
+  ascii_id(Id),
   dot_node_id(Out, Id, [label(Op)]),
   maplist(export_tree_(Out), Trees, Ids),
   maplist(dot_edge_id(Out, Id), Ids).

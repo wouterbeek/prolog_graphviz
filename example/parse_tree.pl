@@ -8,6 +8,7 @@
 :- use_module(library(yall)).
 
 :- use_module(library(gv)).
+:- use_module(library(term_ext)).
 
 export :-
   tree(Tree),
@@ -27,7 +28,7 @@ view(Tree) :-
 
 export_tree_(Out, Tree, Id) :-
   Tree =.. [Op|Trees],
-  dot_id(Id),
+  ascii_id(Id),
   dot_node_id(Out, Id, [label(Op)]),
   maplist(export_tree_(Out), Trees, Ids),
   maplist(dot_edge_id(Out, Id), Ids).

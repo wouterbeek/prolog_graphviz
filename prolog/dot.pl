@@ -20,8 +20,6 @@
     dot_graph/2,          % +Out, :Goal_1
     dot_graph/3,          % +Out, :Goal_1, +Options
     dot_html_replace/2,   % +Unescaped, -Escaped
-    dot_id/1,             % -Id
-    dot_id/2,             % +Term, -Id
     dot_node/2,           % +Out, +Term
     dot_node/3,           % +Out, +Term, +Options
     dot_node_id/2,        % +Out, +Id
@@ -37,14 +35,13 @@
 
 :- use_module(library(apply)).
 :- use_module(library(error)).
-:- use_module(library(uuid)).
 :- use_module(library(yall)).
 
 :- use_module(library(dcg)).
 :- use_module(library(dict)).
 :- use_module(library(debug_ext)).
 :- use_module(library(file_ext)).
-:- use_module(library(hash_ext)).
+:- use_module(library(term_ext)).
 
 :- use_module(dot_html).
 
@@ -74,14 +71,14 @@
 %      preferable.  However, there are legitimate use cases where the
 %      programmer would like to generate and use the DOT IDs herself.
 %      For these purposes, dot_arc_id/[3,4] can be used -- in
-%      combination with dot_id/2 -- instead.
+%      combination with ascii_id/2 -- instead.
 
 dot_arc(Out, FromTerm, ToTerm) :-
   dot_arc(Out, FromTerm, ToTerm, options{}).
 
 
 dot_arc(Out, FromTerm, ToTerm, Options) :-
-  maplist(dot_id, [FromTerm,ToTerm], [FromId,ToId]),
+  maplist(ascii_id, [FromTerm,ToTerm], [FromId,ToId]),
   dot_arc_id(Out, FromId, ToId, Options).
 
 
@@ -163,7 +160,7 @@ dot_cluster(Out, Term, Goal_1) :-
 
 
 dot_cluster(Out, Term, Goal_1, Options) :-
-  dot_id(Term, Id),
+  ascii_id(Term, Id),
   dot_cluster_id(Out, Id, Goal_1, Options).
 
 
@@ -176,7 +173,7 @@ dot_cluster_arc(Out, FromTerm, ToTerm) :-
 
 
 dot_cluster_arc(Out, FromTerm, ToTerm, Options) :-
-  maplist(dot_id, [FromTerm,ToTerm], [FromId,ToId]),
+  maplist(ascii_id, [FromTerm,ToTerm], [FromId,ToId]),
   dot_cluster_arc_id(Out, FromId, ToId, Options).
 
 
@@ -227,14 +224,14 @@ dot_cluster_id(Out, Id, Goal_1, Options) :-
 %      preferable.  However, there are legitimate use cases where the
 %      programmer would like to generate and use the DOT IDs
 %      themselves.  For these purposes, dot_edge_id/[3,4] can be used
-%      -- in combination with dot_id/2 -- instead.
+%      -- in combination with ascii_id/2 -- instead.
 
 dot_edge(Out, FromTerm, ToTerm) :-
   dot_edge(Out, FromTerm, ToTerm, options{}).
 
 
 dot_edge(Out, FromTerm, ToTerm, Options) :-
-  maplist(dot_id, [FromTerm,ToTerm], [FromId,ToId]),
+  maplist(ascii_id, [FromTerm,ToTerm], [FromId,ToId]),
   dot_edge_id(Out, FromId, ToId, Options).
 
 
@@ -348,31 +345,6 @@ html_replace --> "".
 
 
 
-%! dot_id(-Id:atom) is det.
-
-dot_id(Id) :-
-  uuid(Id0, [format(integer)]),
-  atom_concat(n, Id0, Id).
-
-
-
-%! dot_id(+Term:term, -Id:atom) is det.
-%
-% Create a DOT ID that can be used to represent a Prolog term in the
-% DOT language.  When the same Prolog term is supplied, the DOT ID is
-% also the same.
-
-dot_id(Term, Id) :-
-  % DOT IDs cannot contain all characters allowed in Prolog terms.
-  % Also, Prolog terms can have arbitrary length.  For these reasons,
-  % we calculate the MD5 hash of a serialization of the Prolog term.
-  md5(Term, Hash),
-  % DOT IDs must start with an ASCII letter.  Since an MD5 hash may
-  % start with a decimal digit, an specific ASCII letter is prefixed.
-  atomic_concat(n, Hash, Id).
-
-
-
 %! dot_node(+Out:stream, +Term:term) is det.
 %! dot_node(+Out:stream, +Term:term, +Options:options) is det.
 %
@@ -400,14 +372,14 @@ dot_id(Term, Id) :-
 %      preferable.  However, there are legitimate use cases where the
 %      programmer would like to generate and use the DOT IDs
 %      themselves.  For these purposes, dot_node_id/[2,3] can be used --
-%      in combination with dot_id/2 -- instead.
+%      in combination with ascii_id/2 -- instead.
 
 dot_node(Out, Term) :-
   dot_node(Out, Term, options{label: Term}).
 
 
 dot_node(Out, Term, Options) :-
-  dot_id(Term, Id),
+  ascii_id(Term, Id),
   dot_node_id(Out, Id, Options).
 
 

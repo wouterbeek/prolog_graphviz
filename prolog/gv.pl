@@ -195,10 +195,10 @@ gv_format(Format) :-
 
 
 
-%! gv_format_media_type(+Format:atom, +MediaType:compound) is semidet.
-%! gv_format_media_type(+Format:atom, -MediaType:compound) is semidet.
-%! gv_format_media_type(-Format:atom, +MediaType:compound) is semidet.
-%! gv_format_media_type(-Format:atom, -MediaType:compound) is multi.
+%! gv_format_media_type(+Format:atom, +MediaType:media_type) is semidet.
+%! gv_format_media_type(+Format:atom, -MediaType:media_type) is semidet.
+%! gv_format_media_type(-Format:atom, +MediaType:media_type) is semidet.
+%! gv_format_media_type(-Format:atom, -MediaType:media_type) is multi.
 
 gv_format_media_type(Format1, MediaType) :-
   ground(Format1), !,

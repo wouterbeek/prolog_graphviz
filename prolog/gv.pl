@@ -92,7 +92,7 @@ gv_export(File, Goal_1, Options0) :-
   write_to_file(
     File,
     gv_export_stream_(Goal_1, Format, Type, Method, Options),
-    [type(Type)]
+    options{type: Type}
   ).
 
 gv_export_default_format_(File, DefaultFormat) :-

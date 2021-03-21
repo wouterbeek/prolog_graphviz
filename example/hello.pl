@@ -1,6 +1,9 @@
-:- module(hello, [export/0, view/0]).
+/** <application> “Hello, world!” GraphViz example
 
-/** <module> Hello, world! for GraphViz
+~~~sh
+$ swipl -s hello.pl -g export -t halt
+$ swipl -s hello.pl -g view -t halt
+~~~
 
 */
 
@@ -8,12 +11,24 @@
 
 :- use_module(library(gv)).
 
-dot("x [label=<Hello,<BR/>world!>,shape=diamond];\n").
+
+
+%! export is det.
 
 export :-
-  dot(String),
+  example_(String),
   gv_export('hello.svg', {String}/[Out]>>format(Out, String, [])).
 
+
+
+%! view is det.
+
 view :-
-  dot(String),
+  example_(String),
   gv_view({String}/[Out]>>format(Out, String, [])).
+
+
+
+% GENERICS %
+
+example_("x [label=<Hello,<BR/>world!>,shape=diamond];\n").

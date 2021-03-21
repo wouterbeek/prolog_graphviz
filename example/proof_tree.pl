@@ -1,6 +1,9 @@
-:- module(proof_tree, [export/0, export/1, view/0, view/1]).
+/** <application> Proof tree example
 
-/** <module> Proof tree example
+~~~sh
+$ swipl -s proof_tree.pl -g export -t halt
+$ swipl -s proof_tree.pl -g view -t halt
+~~~
 
 */
 
@@ -9,32 +12,57 @@
 
 :- use_module(library(gv)).
 
+
+
+%! export is det.
+%! export(+Proof:tree) is det.
+
 export :-
-  proof(Proof),
+  example_(Proof),
   export(Proof).
 
-export(Proof) :-
-  gv_export('proof_tree.svg', {Proof}/[Out]>>export_proof_(Out, Proof), [directed(true)]).
 
-proof(t(rdfs(3), ∈(class,class), [t(axiom(rdfs), range(range,class), []),
-                                  t(axiom(rdfs), range(⊆,class), [])])).
+export(Proof) :-
+  gv_export(
+    'proof_tree.svg',
+    {Proof}/[Out]>>export_proof_(Out, Proof),
+    options{directed: true}
+  ).
+
+
+
+%! view is det.
+%! view(+Proof:tree) is det.
 
 view :-
-  proof(Proof),
+  example_(Proof),
   view(Proof).
 
+
 view(Proof) :-
-  gv_view({Proof}/[Out]>>export_proof_(Out, Proof), [directed(true)]).
+  gv_view(
+    {Proof}/[Out]>>export_proof_(Out, Proof),
+    options{directed: true}
+  ).
+
+
+
+% GENERICS %
 
 export_proof_(Out, Proof) :-
-  Proof = t(Rule,Concl,SubProofs),
+  Proof = tree(Rule,Concl,SubProofs),
   dot_node(Out, Concl),
   dot_node(Out, Proof, [label(Rule)]),
   dot_arc(Out, Concl, Proof),
   maplist(export_subproof_(Out, Proof), SubProofs).
 
 export_subproof_(Out, Proof, SubProof) :-
-  SubProof = t(_,Prem,_),
+  SubProof = tree(_,Prem,_),
   dot_node(Out, Prem),
   dot_arc(Out, Proof, Prem),
   export_proof_(Out, SubProof).
+
+example_(tree(rdfs(3),
+              ∈(class,class),
+              [tree(axiom(rdfs), range(range,class), []),
+               tree(axiom(rdfs), range(⊆,class), [])])).

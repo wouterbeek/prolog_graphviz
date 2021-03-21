@@ -57,8 +57,8 @@
 
 
 
-%! dot_arc(+Out:stream, +FromTerm:term, +ToTerm:term) is det.
-%! dot_arc(+Out:stream, +FromTerm:term, +ToTerm:term, +Options:options) is det.
+%! dot_arc(+Out:ostream, +FromTerm:term, +ToTerm:term) is det.
+%! dot_arc(+Out:ostream, +FromTerm:term, +ToTerm:term, +Options:options) is det.
 %
 % Emits an arc (directed edge) from one Prolog term to another in the
 % DOT language.
@@ -83,8 +83,8 @@ dot_arc(Out, FromTerm, ToTerm, Options) :-
 
 
 
-%! dot_arc_id(+Out:stream, +FromId:atom, +ToId:atom) is det.
-%! dot_arc_id(+Out:stream, +FromId:atom, +ToId:atom, +Options:options) is det.
+%! dot_arc_id(+Out:ostream, +FromId:atom, +ToId:atom) is det.
+%! dot_arc_id(+Out:ostream, +FromId:atom, +ToId:atom, +Options:options) is det.
 %
 % Emits a directed edge or arc from one DOT ID to another in the DOT
 % language.
@@ -152,8 +152,8 @@ dot_attributes(Options, String) :-
 
 
 
-%! dot_cluster(+Out:stream, +Term:term, :Goal_1) is det.
-%! dot_cluster(+Out:stream, +Term:term, :Goal_1, +Options:options) is det.
+%! dot_cluster(+Out:ostream, +Term:term, :Goal_1) is det.
+%! dot_cluster(+Out:ostream, +Term:term, :Goal_1, +Options:options) is det.
 
 dot_cluster(Out, Term, Goal_1) :-
   dot_cluster(Out, Term, Goal_1, options{label: Term}).
@@ -165,8 +165,8 @@ dot_cluster(Out, Term, Goal_1, Options) :-
 
 
 
-%! dot_cluster_arc(+Out:stream, +FromTerm:term, +ToTerm:term) is det.
-%! dot_cluster_arc(+Out:stream, +FromTerm:term, +ToTerm:term, +Options:options) is det.
+%! dot_cluster_arc(+Out:ostream, +FromTerm:term, +ToTerm:term) is det.
+%! dot_cluster_arc(+Out:ostream, +FromTerm:term, +ToTerm:term, +Options:options) is det.
 
 dot_cluster_arc(Out, FromTerm, ToTerm) :-
   dot_cluster_arc(Out, FromTerm, ToTerm, options{}).
@@ -178,8 +178,8 @@ dot_cluster_arc(Out, FromTerm, ToTerm, Options) :-
 
 
 
-%! dot_cluster_arc_id(+Out:stream, +FromId:atom, +ToId:atom) is det.
-%! dot_cluster_arc_id(+Out:stream, +FromId:atom, +ToId:atom, +Options:options) is det.
+%! dot_cluster_arc_id(+Out:ostream, +FromId:atom, +ToId:atom) is det.
+%! dot_cluster_arc_id(+Out:ostream, +FromId:atom, +ToId:atom, +Options:options) is det.
 
 dot_cluster_arc_id(Out, FromId, ToId) :-
   dot_cluster_arc_id(Out, FromId, ToId, options{}).
@@ -193,8 +193,8 @@ dot_cluster_arc_id(Out, FromId0, ToId0, Options0) :-
 
 
 
-%! dot_cluster_id(+Out:stream, +Id:atom, :Goal_1) is det.
-%! dot_cluster_id(+Out:stream, +Id:atom, :Goal_1, +Options:options) is det.
+%! dot_cluster_id(+Out:ostream, +Id:atom, :Goal_1) is det.
+%! dot_cluster_id(+Out:ostream, +Id:atom, :Goal_1, +Options:options) is det.
 
 dot_cluster_id(Out, Id, Goal_1) :-
   dot_cluster_id(Out, Id, Goal_1, options{}).
@@ -210,8 +210,8 @@ dot_cluster_id(Out, Id, Goal_1, Options) :-
 
 
 
-%! dot_edge(+Out:stream, +FromTerm:term, +ToTerm:term) is det.
-%! dot_edge(+Out:stream, +FromTerm:term, +ToTerm:term, +Options:options) is det.
+%! dot_edge(+Out:ostream, +FromTerm:term, +ToTerm:term) is det.
+%! dot_edge(+Out:ostream, +FromTerm:term, +ToTerm:term, +Options:options) is det.
 %
 % Emits an edge between two Prolog terms in the DOT language.
 %
@@ -236,8 +236,8 @@ dot_edge(Out, FromTerm, ToTerm, Options) :-
 
 
 
-%! dot_edge_id(+Out:stream, +FromId:atom, +ToId:atom) is det.
-%! dot_edge_id(+Out:stream, +FromId:atom, +ToId:atom, +Options:options) is det.
+%! dot_edge_id(+Out:ostream, +FromId:atom, +ToId:atom) is det.
+%! dot_edge_id(+Out:ostream, +FromId:atom, +ToId:atom, +Options:options) is det.
 %
 % Emits an edge between two DOT IDs in the DOT language.
 %
@@ -253,8 +253,8 @@ dot_edge_id(Out, FromId, ToId, Options) :-
 
 
 
-%! dot_graph(+Out:stream, :Goal_1) is det.
-%! dot_graph(+Out:stream, :Goal_1, +Options:options) is det.
+%! dot_graph(+Out:ostream, :Goal_1) is det.
+%! dot_graph(+Out:ostream, :Goal_1, +Options:options) is det.
 %
 % @arg Options The following options are supported:
 %
@@ -345,8 +345,8 @@ html_replace --> "".
 
 
 
-%! dot_node(+Out:stream, +Term:term) is det.
-%! dot_node(+Out:stream, +Term:term, +Options:options) is det.
+%! dot_node(+Out:ostream, +Term:term) is det.
+%! dot_node(+Out:ostream, +Term:term, +Options:options) is det.
 %
 % @arg Out is a handle to an output stream.
 %
@@ -384,8 +384,8 @@ dot_node(Out, Term, Options) :-
 
 
 
-%! dot_node_id(+Out:stream, +Id:atom) is det.
-%! dot_node_id(+Out:stream, +Id:atom, +Options:options) is det.
+%! dot_node_id(+Out:ostream, +Id:atom) is det.
+%! dot_node_id(+Out:ostream, +Id:atom, +Options:options) is det.
 %
 % @see dot_node/[2,3] allows nodes to be asserted for Prolog terms.
 

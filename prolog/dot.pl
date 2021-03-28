@@ -70,8 +70,8 @@
 % @see Most of the time, the use of Prolog terms instead of DOT IDs is
 %      preferable.  However, there are legitimate use cases where the
 %      programmer would like to generate and use the DOT IDs herself.
-%      For these purposes, dot_arc_id/[3,4] can be used -- in
-%      combination with ascii_id/2 -- instead.
+%      For these purposes, dot_arc_id/[3,4] can be used ― in
+%      combination with ascii_id/2 ― instead.
 
 dot_arc(Out, FromTerm, ToTerm) :-
   dot_arc(Out, FromTerm, ToTerm, options{}).
@@ -216,15 +216,15 @@ dot_cluster_id(Out, Id, Goal_1, Options) :-
 % Emits an edge between two Prolog terms in the DOT language.
 %
 % Since Prolog terms cannot be immediate used as DOT IDs,
-% dot_edge/[3,4] and dot_node/[2,3] automatically create compatible DOT
-% IDs under the hood.  When the same Prolog term is given to these
+% dot_edge/[3,4] and dot_node/[2,3] automatically create compatible
+% DOT IDs under the hood.  When the same Prolog term is given to these
 % predicates, it is guaranteed that the DOT ID will also be the same.
 %
 % @see Most of the time, the use of Prolog terms instead of DOT ID is
 %      preferable.  However, there are legitimate use cases where the
 %      programmer would like to generate and use the DOT IDs
 %      themselves.  For these purposes, dot_edge_id/[3,4] can be used
-%      -- in combination with ascii_id/2 -- instead.
+%      ― in combination with ascii_id/2 ― instead.
 
 dot_edge(Out, FromTerm, ToTerm) :-
   dot_edge(Out, FromTerm, ToTerm, options{}).
@@ -241,7 +241,8 @@ dot_edge(Out, FromTerm, ToTerm, Options) :-
 %
 % Emits an edge between two DOT IDs in the DOT language.
 %
-% @see dot_edge/[3,4] allows edges to be asserted between Prolog terms.
+% @see dot_edge/[3,4] allows edges to be asserted between Prolog
+%      terms.
 
 dot_edge_id(Out, FromId, ToId) :-
   dot_edge_id(Out, FromId, ToId, options{}).
@@ -256,29 +257,29 @@ dot_edge_id(Out, FromId, ToId, Options) :-
 %! dot_graph(+Out:ostream, :Goal_1) is det.
 %! dot_graph(+Out:ostream, :Goal_1, +Options:options) is det.
 %
-% @arg Options The following options are supported:
+% @param Options The following options are supported:
 %
-%   * directed(+boolean)
+%        * directed(+boolean)
 %
-%     Whether the graph is directed (`true`) or undirected (`false`,
-%     default).
+%          Whether the graph is directed (`true`) or undirected
+%          (`false`, default).
 %
-%   * name(+string)
+%        * name(+string)
 %
-%     The name of the graph.  Default is `"noname"`.
+%          The name of the graph.  Default is `"noname"`.
 %
-%   * overlap(+boolean)
+%        * overlap(+boolean)
 %
-%     Whether or not nodes are allowed to overlap.  Default is
-%    `false`.
+%          Whether or not nodes are allowed to overlap.  Default is
+%          `false`.
 %
-%   * strict(+boolean)
+%        * strict(+boolean)
 %
-%     Value `true' indicates that the graph is strict, i.e., has no
-%     self-arcs and has not multi-edges.  Default is `false'.
+%          Value `true' indicates that the graph is strict, i.e., has
+%          no self-arcs and has not multi-edges.  Default is `false'.
 %
-%     This can only be used in combination with option
-%     `directed(true)', and throws an exception otherwise.
+%          This can only be used in combination with option
+%          `directed(true)', and throws an exception otherwise.
 
 dot_graph(Out, Goal_1) :-
   dot_graph(Out, Goal_1, options{}).
@@ -348,31 +349,32 @@ html_replace --> "".
 %! dot_node(+Out:ostream, +Term:term) is det.
 %! dot_node(+Out:ostream, +Term:term, +Options:options) is det.
 %
-% @arg Out is a handle to an output stream.
+% @param Out A handle to an output stream.
 %
-% @arg is a Prolog term.
+% @param Term A Prolog term.
 %
-% @arg Options is a list of compound terms, each of which denotes a
-% GraphViz attribute.  The following attributes are supported:
+% @param Options A list of compound terms, each of which denotes a
+%                GraphViz attribute.  The following attributes are
+%                supported:
 %
-%   * label(+or([string,list(string)]))
+%        * label(+or([string,list(string)]))
 %
-%     Allows either a single string or a list of strings to be used as
-%     a node label.  The strings are allowed to contain Unicode
-%     characters and a limited set of HTML tags for markup purposes
-%     (see `README.org`).  Regular DOT labels do not allow such
-%     flexibility, so strings supplied through this option are
-%     exported as DOT HTML labels.
+%          Allows either a single string or a list of strings to be
+%          used as a node label.  The strings are allowed to contain
+%          Unicode characters and a limited set of HTML tags for
+%          markup purposes (see `README.org`).  Regular DOT labels do
+%          not allow such flexibility, so strings supplied through
+%          this option are exported as DOT HTML labels.
 %
-%   * Other options are written as regular DOT attributes
-%     (`KEY="VALUE"`).  See `README.org` for an overview of supported
-%     GraphViz attributes.
+%        * Other options are written as regular DOT attributes
+%          (`KEY="VALUE"`).  See `README.org` for an overview of
+%          supported GraphViz attributes.
 %
 % @see Most of the time, the use of Prolog terms instead of DOT ID is
 %      preferable.  However, there are legitimate use cases where the
 %      programmer would like to generate and use the DOT IDs
-%      themselves.  For these purposes, dot_node_id/[2,3] can be used --
-%      in combination with ascii_id/2 -- instead.
+%      themselves.  For these purposes, dot_node_id/[2,3] can be used
+%      ― in combination with ascii_id/2 ― instead.
 
 dot_node(Out, Term) :-
   dot_node(Out, Term, options{label: Term}).

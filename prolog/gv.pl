@@ -55,31 +55,32 @@
 %! gv_export(+File:atom, :Goal_1) is det.
 %! gv_export(+File:atom, :Goal_1, +Options:options) is det.
 %
-% @arg File is the name of the file to which the graph export is
-%      written.
+% @param File is the name of the file to which the graph export is
+%        written.
 %
-% @arg Goal_1 is a unary goal that takes a Prolog output stream that
-%      receives DOT formatted messages.
+% @param Goal_1 is a unary goal that takes a Prolog output stream that
+%        receives DOT formatted messages.
 %
-% @arg Options is a dictionary that may include any of the following
-%      options:
+% @param Options is a dictionary that may include any of the following
+%        options:
 %
-%   * format(+atom)
+%        * format(+atom)
 %
-%     The format that is used to store the output in.  Both binary and
-%     text output formats are supported.  See `gv_format_type(-Format,
-%     Type), memberchk(Type, [binary,text])` for possible values.  The
-%     default value is based on the file extension of File, if this
-%     can be heuristically mapped to a GraphViz format, or else uses
-%     the value of setting `default_gv_export_format`.
+%          The format that is used to store the output in.  Both
+%          binary and text output formats are supported.  See
+%          `gv_format_type(-Format, Type), memberchk(Type,
+%          [binary,text])` for possible values.  The default value is
+%          based on the file extension of File, if this can be
+%          heuristically mapped to a GraphViz format, or else uses the
+%          value of setting `default_gv_export_format`.
 %
-%   * method(+atom)
+%        * method(+atom)
 %
-%     The method that is used by GraphViz to calculate the graph
-%     layout.  See `gv_method(-Method)` for possible values.  The
-%     default value is stored in setting `default_gv_method`.
+%          The method that is used by GraphViz to calculate the graph
+%          layout.  See `gv_method(-Method)` for possible values.  The
+%          default value is stored in setting `default_gv_method`.
 %
-%   * Other options are passed to dot_graph/4.
+%        * Other options are passed to dot_graph/4.
 
 gv_export(File, Goal_1) :-
   gv_export(File, Goal_1, options{}).
@@ -155,12 +156,12 @@ gv_export_stream_(Goal_1, Format, Type, Method, Options, Out) :-
 % Generate a GraphViz graph visualization and open the result in a
 % viewer application.
 %
-% @arg Goal_1 is a unary goal that takes a Prolog output stream that
-%      receives DOT formatted messages.
+% @param Goal_1 is a unary goal that takes a Prolog output stream that
+%        receives DOT formatted messages.
 %
-% @arg Options is a dictionary that may include any of the options
-%      defined for gv_export/3, but option `format' is set to the
-%      value of setting `default_gv_view_format'.
+% @param Options is a dictionary that may include any of the options
+%        defined for gv_export/3, but option `format' is set to the
+%        value of setting `default_gv_view_format'.
 
 gv_view(Goal_1) :-
   gv_view(Goal_1, options{}).

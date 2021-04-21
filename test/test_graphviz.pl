@@ -21,7 +21,7 @@ test(hello, [cleanup(delete_file(File))]) :-
   File = 'hello.pdf',
   test_gv_export(
     File,
-    [Out]>>format(Out, "x [label=<Hello,<BR/>world!>,shape=diamond];\n", [])
+    [Out0]>>format(Out0, "x [label=<Hello,<BR/>world!>,shape=diamond];\n", [])
   ).
 
 
@@ -30,21 +30,26 @@ test(hello2, [cleanup(delete_file(File))]) :-
   File = 'hello2.pdf',
   test_gv_export(
     File,
-    [Out]>>dot_node(Out, hello, options{label: ["Hello,","world!"], shape: diamond})
+    [Out0]>>
+      dot_node(
+        Out0,
+        hello,
+        options{label: ["Hello,","world!"], shape: diamond}
+      )
   ).
 
 
 
 test(arc, [cleanup(delete_file(File))]) :-
   File = 'arc.svg',
-  test_gv_export(File, [Out]>>format(Out, "John -- Mary [label=arc]", [])).
+  test_gv_export(File, [Out0]>>format(Out0, "John -- Mary [label=arc]", [])).
 
 
 
 test(parse_tree, [cleanup(delete_file(File))]) :-
   File = 'parse_tree.svg',
   Tree = s(np(det(the),n(cat)),vp(v(knows),np(det(the),n(dog)))),
-  test_gv_export(File, {Tree}/[Out]>>export_tree_(Out, Tree, _)).
+  test_gv_export(File, {Tree}/[Out0]>>export_tree_(Out0, Tree, _)).
 
 export_tree_(Out, Tree, Id) :-
   Tree =.. [Op|Trees],
@@ -61,7 +66,7 @@ test(proof_tree, [cleanup(delete_file(File))]) :-
                                         tree(axiom(rdfs),range(⊆,class),[])]),
   test_gv_export(
     File,
-    {Proof}/[Out]>>export_proof_(Out, Proof),
+    {Proof}/[Out0]>>export_proof_(Out0, Proof),
     options{directed: true}
   ).
 

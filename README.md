@@ -39,7 +39,7 @@ Prolog output stream.  The following example (see
 consisting of one node, and open the result in a GraphViz viewer:
 
 ```pl
-?- gv_view([Out]>>format(Out, "x [label=<Hello,<BR/>world!>,shape=diamond];\n", [])).
+?- gv_view([Out0]>>format(Out0, "x [label=<Hello,<BR/>world!>,shape=diamond];\n", [])).
 ```
 
 This opens the following image inside a GraphViz-compatible viewer:
@@ -52,7 +52,7 @@ In this example (see [`example/loves.pl`](example/loves.pl)) we write
 a graph that consists of a single edge:
 
 ```pl
-?- gv_export('loves.svg', [Out]>>format(Out, "John -- Mary [label=loves];\n", [])).
+?- gv_export('loves.svg', [Out0]>>format(Out0, "John -- Mary [label=loves];\n", [])).
 ```
 
 This writes the following image to an SVG file.  See the table in
@@ -101,7 +101,7 @@ graph.
 :- use_module(library(yall)).
 
 view_proof(Proof) :-
-  gv_view({Proof}/[Out]>>export_proof(Out, Proof), [directed(true)]).
+  gv_view({Proof}/[Out0]>>export_proof(Out0, Proof), [directed(true)]).
 
 export_proof(Out, Tree) :-
   Tree = t(Rule,Concl,Prems),
@@ -148,7 +148,7 @@ The following code exports such parse trees to SVG (see
 :- use_module(library(yall)).
 
 export_tree(Tree) :-
-  gv_export('parse_tree.svg', {Tree}/[Out]>>export_tree(Out, Tree, _)).
+  gv_export('parse_tree.svg', {Tree}/[Out0]>>export_tree(Out0, Tree, _)).
 
 export_tree(Out, Tree, Id) :-
   Tree =.. [Op|Trees],

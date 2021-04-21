@@ -24,7 +24,7 @@ export :-
 
 
 export(Tree) :-
-  gv_export('parse_tree.svg', {Tree}/[Out]>>export_tree_(Out, Tree, _)).
+  gv_export('parse_tree.svg', {Tree}/[Out0]>>export_tree_(Out0, Tree, _)).
 
 
 
@@ -37,7 +37,7 @@ view :-
 
 
 view(Tree) :-
-  gv_view({Tree}/[Out]>>export_tree_(Out, Tree, _)).
+  gv_view({Tree}/[Out0]>>export_tree_(Out0, Tree, _)).
 
 
 

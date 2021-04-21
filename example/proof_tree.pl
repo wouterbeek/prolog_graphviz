@@ -25,7 +25,7 @@ export :-
 export(Proof) :-
   gv_export(
     'proof_tree.svg',
-    {Proof}/[Out]>>export_proof_(Out, Proof),
+    {Proof}/[Out0]>>export_proof_(Out0, Proof),
     options{directed: true}
   ).
 
@@ -41,7 +41,7 @@ view :-
 
 view(Proof) :-
   gv_view(
-    {Proof}/[Out]>>export_proof_(Out, Proof),
+    {Proof}/[Out0]>>export_proof_(Out0, Proof),
     options{directed: true}
   ).
 

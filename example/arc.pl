@@ -17,7 +17,7 @@ $ swipl -s arc.pl -g view -t halt
 
 export :-
   example_(String),
-  gv_export('loves.svg', {String}/[Out]>>format(Out, String, [])).
+  gv_export('loves.svg', {String}/[Out0]>>format(Out0, String, [])).
 
 
 
@@ -25,7 +25,7 @@ export :-
 
 view :-
   example_(String),
-  gv_view({String}/[Out]>>format(Out, String, [])).
+  gv_view({String}/[Out0]>>format(Out0, String, [])).
 
 
 

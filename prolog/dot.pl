@@ -1,3 +1,4 @@
+:- encoding(utf8).
 :- module(
   dot,
   [
@@ -46,12 +47,12 @@
 :- use_module(dot_html).
 
 :- meta_predicate
-    dot_graph(+, 1),
-    dot_graph(+, 1, +),
-    dot_cluster(+, +, 1),
-    dot_cluster(+, +, 1, +),
-    dot_cluster_id(+, +, 1),
-    dot_cluster_id(+, +, 1, +).
+   dot_graph(+, 1),
+   dot_graph(+, 1, +),
+   dot_cluster(+, +, 1),
+   dot_cluster(+, +, 1, +),
+   dot_cluster_id(+, +, 1),
+   dot_cluster_id(+, +, 1, +).
 
 
 

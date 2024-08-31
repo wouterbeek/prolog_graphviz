@@ -1,3 +1,4 @@
+:- encoding(utf8).
 :- module(
   gv,
   [
@@ -28,16 +29,16 @@
 :- use_module(library(file_ext)).
 
 :- discontiguous
-    gv_format_synonym__/2,
-    gv_format_type__/2,
-    gv_format_type__/3.
+   gv_format_synonym__/2,
+   gv_format_type__/2,
+   gv_format_type__/3.
 
 :- meta_predicate
-    gv_export(+, 1),
-    gv_export(+, 1, +),
-    gv_export_stream_(1, +, +, +, +, +),
-    gv_view(1),
-    gv_view(1, +).
+   gv_export(+, 1),
+   gv_export(+, 1, +),
+   gv_export_stream_(1, +, +, +, +, +),
+   gv_view(1),
+   gv_view(1, +).
 
 :- setting(default_gv_export_format, atom, svg,
            "The default format that is used when exporting a graph using GraphViz.").
